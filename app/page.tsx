@@ -296,27 +296,15 @@ export default function Home() {
   const [consensusSectionExpanded, setConsensusSectionExpanded] =
     useState(true);
 
-  const [expandedDays, setExpandedDays] = useState<Record<string, boolean>>({
-    "June 9, 2026": true,
-
-    "June 8, 2026": false,
-
-    "June 7, 2026": false,
-
-    "June 6, 2026": false,
-
-    "June 5, 2026": false,
-
-    "June 4, 2026": false,
-
-    "June 3, 2026": false,
-
-    "June 2, 2026": false,
-
-    "June 1, 2026": false,
-
-    "May 31, 2026": false,
-  });
+  const [expandedDays, setExpandedDays] = useState<Record<string, boolean>>(
+    () => {
+      const initial: Record<string, boolean> = {};
+      dailyNewsData.forEach((day, idx) => {
+        initial[day.date] = idx === 0;
+      });
+      return initial;
+    },
+  );
 
   const [showNewsArchiveModal, setShowNewsArchiveModal] = useState(false);
 
