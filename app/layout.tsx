@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Onwards | Your Career Control Center & Transition Navigation",
+  title: "Onwards | Your Transition, Optimized",
   description: "Seamlessly navigate career transitions, manage life ops, match resumes with real-time target roles, and access customized daily schedules calibrated for peak productivity.",
 };
 
