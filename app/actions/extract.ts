@@ -13,6 +13,10 @@ export interface Role {
   company: string;
   matchScore: number;
   description: string;
+  link?: string;
+  location?: string;
+  postDate?: string;
+  source?: 'LinkedIn' | 'Ladders' | 'Wellfound' | 'Built In' | 'We Work Remotely';
 }
 
 export async function extractMetrics() {

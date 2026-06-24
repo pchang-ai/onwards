@@ -1,6 +1,6 @@
-"use server";
-
 import { extractMetrics } from "./extract";
+import { getJobsForKeywords } from "./jobSearch";
+
 
 export async function uploadResume(formData: FormData) {
   const file = formData.get("resume") as File | null;
@@ -89,6 +89,16 @@ export async function uploadResume(formData: FormData) {
     roles = mockData.roles;
   }
 
+  // Retrieve real jobs for the candidate instead of fake/hallucinated ones
+  try {
+    const keywords = roles.map((r: any) => r.title || r.label || "");
+    console.log("Matching extracted roles/skills to real jobs:", keywords);
+    roles = await getJobsForKeywords(keywords);
+  } catch (error) {
+    console.error("Error fetching real jobs during upload:", error);
+    // Keep fallback roles if searching fails completely
+  }
+
   return { 
     success: true, 
     message: "Resume processed successfully!",
@@ -96,3 +106,4 @@ export async function uploadResume(formData: FormData) {
     roles
   };
 }
+

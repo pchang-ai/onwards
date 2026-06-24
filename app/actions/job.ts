@@ -90,11 +90,19 @@ export async function pollJobStatus(runId: number) {
         if (outputData.notebook_output && outputData.notebook_output.result) {
           try {
             const parsedResult = JSON.parse(outputData.notebook_output.result);
+            let roles = parsedResult.roles || [];
+            try {
+              const { getJobsForKeywords } = await import('./jobSearch');
+              const keywords = roles.map((r: any) => r.title || r.label || "");
+              roles = await getJobsForKeywords(keywords);
+            } catch (err) {
+              console.error("Failed to map Databricks jobs to real jobs:", err);
+            }
             return { 
               success: true, 
               status: "COMPLETED", 
               metrics: parsedResult.metrics || [], 
-              roles: parsedResult.roles || [] 
+              roles
             };
           } catch (e) {
             console.error("Failed to parse notebook output as JSON. Falling back to mock data.", e);
@@ -104,12 +112,21 @@ export async function pollJobStatus(runId: number) {
 
       // Fallback to mock data if the notebook output wasn't cleanly formatted JSON yet
       const mockResult = await import('./extract').then(m => m.extractMetrics());
+      let fallbackRoles = mockResult.roles;
+      try {
+        const { getJobsForKeywords } = await import('./jobSearch');
+        const keywords = fallbackRoles.map((r: any) => r.title || r.label || "");
+        fallbackRoles = await getJobsForKeywords(keywords);
+      } catch (err) {
+        console.error("Failed to map mock jobs to real jobs in pollJobStatus:", err);
+      }
       return { 
         success: true, 
         status: "COMPLETED", 
         metrics: mockResult.metrics, 
-        roles: mockResult.roles 
+        roles: fallbackRoles
       };
+
     }
 
     // Job failed or was canceled

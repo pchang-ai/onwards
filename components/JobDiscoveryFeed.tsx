@@ -4,9 +4,25 @@ import { Role } from "@/app/actions/extract";
 
 interface JobDiscoveryFeedProps {
   roles?: Role[];
-
   isLoading?: boolean;
 }
+
+const getSourceBadgeStyle = (source?: string) => {
+  switch (source) {
+    case "LinkedIn":
+      return "bg-sky-500/10 text-sky-400 border border-sky-500/20";
+    case "Ladders":
+      return "bg-amber-500/10 text-amber-400 border border-amber-500/20";
+    case "Wellfound":
+      return "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+    case "Built In":
+      return "bg-rose-500/10 text-rose-400 border border-rose-500/20";
+    case "We Work Remotely":
+      return "bg-orange-500/10 text-orange-400 border border-orange-500/20";
+    default:
+      return "bg-slate-500/10 text-slate-400 border border-slate-500/20";
+  }
+};
 
 const JobDiscoveryFeed: React.FC<JobDiscoveryFeedProps> = ({
   roles,
@@ -29,7 +45,6 @@ const JobDiscoveryFeed: React.FC<JobDiscoveryFeedProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {isLoading ? (
           // Shimmer Loading Skeletons
-
           Array.from({ length: 4 }).map((_, idx) => (
             <div
               key={`skeleton-role-${idx}`}
@@ -56,16 +71,16 @@ const JobDiscoveryFeed: React.FC<JobDiscoveryFeedProps> = ({
           displayRoles.map((role) => (
             <div
               key={role.id}
-              className="group relative bg-[#0e2018] backdrop-blur-md rounded-2xl hover:bg-[#122b20] hover:shadow-[0_4px_25px_rgba(16,185,129,0.15)] p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-emerald-950/20 flex flex-col"
+              className="group relative bg-[#0e2018] backdrop-blur-md rounded-2xl hover:bg-[#122b20] hover:shadow-[0_4px_25px_rgba(16,185,129,0.15)] p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-emerald-950/20 flex flex-col justify-between"
             >
               {/* Glow effect for high matches */}
-
               {role.matchScore > 90 && (
                 <div className="absolute -inset-0.5 bg-gradient-to-br from-emerald-500/20 to-teal-500/0 rounded-2xl blur opacity-0 group-hover:opacity-100 transition duration-500 pointer-events-none" />
               )}
 
               <div className="relative z-10 flex flex-col h-full">
-                <div className="flex justify-between items-start mb-4">
+                {/* Card Header: Company, Title, Match, and Source Badge */}
+                <div className="flex justify-between items-start mb-3">
                   <div>
                     <div className="text-sm font-semibold text-emerald-450 mb-1 tracking-wide uppercase">
                       {role.company}
@@ -74,21 +89,40 @@ const JobDiscoveryFeed: React.FC<JobDiscoveryFeedProps> = ({
                     <h4 className="text-xl font-bold text-slate-100 leading-snug">
                       {role.title}
                     </h4>
+
+                    {/* Location Tag */}
+                    {role.location && (
+                      <div className="text-xs text-slate-400 mt-1.5 flex items-center gap-1 select-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-slate-500" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                        </svg>
+                        {role.location}
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex flex-col items-end gap-2 shrink-0 ml-4">
-                    <div className="flex items-center gap-1.5 px-3 py-1 bg-slate-950/80 rounded-full  shadow-inner">
+                    {/* Match Percentage */}
+                    <div className="flex items-center gap-1.5 px-3 py-1 bg-slate-950/80 rounded-full shadow-inner select-none">
                       <span className="text-sm font-bold text-white">
                         {role.matchScore}%
                       </span>
 
                       <span className="text-xs text-slate-400">Match</span>
                     </div>
+
+                    {/* Source Board Badge */}
+                    {role.source && (
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider select-none ${getSourceBadgeStyle(role.source)}`}>
+                        {role.source}
+                      </span>
+                    )}
                   </div>
                 </div>
 
+                {/* High Value Badge */}
                 {role.matchScore > 90 && (
-                  <div className="mb-4 inline-flex items-center gap-1.5">
+                  <div className="mb-4 inline-flex items-center gap-1.5 select-none">
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
 
                     <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest">
@@ -97,29 +131,45 @@ const JobDiscoveryFeed: React.FC<JobDiscoveryFeedProps> = ({
                   </div>
                 )}
 
-                <p className="text-sm text-slate-400 leading-relaxed mt-auto">
+                {/* Job Description / Snippet */}
+                <p className="text-sm text-slate-400 leading-relaxed mt-2 mb-6">
                   {role.description}
                 </p>
 
-                <div className="mt-6 pt-4 border-t border-emerald-950/20 flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <span className="text-sm font-medium text-slate-300">
-                    Review Fit Analysis
+                {/* Card Footer: Post Date and Active Apply Link */}
+                <div className="mt-auto pt-4 border-t border-emerald-950/20 flex justify-between items-center relative z-20">
+                  <span className="text-xs text-slate-500 select-none">
+                    {role.postDate || 'Open Position'}
                   </span>
 
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-5 w-5 text-emerald-400 group-hover:translate-x-1 transition-transform"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M14 5l7 7m0 0l-7 7m7-7H3"
-                    />
-                  </svg>
+                  {role.link ? (
+                    <a
+                      href={role.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-sm font-semibold text-emerald-440 hover:text-emerald-350 hover:underline transition-colors cursor-pointer"
+                    >
+                      Apply on {role.source || 'Board'}
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                        />
+                      </svg>
+                    </a>
+                  ) : (
+                    <span className="text-sm font-semibold text-emerald-450 select-none">
+                      Match Insights &rarr;
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -135,3 +185,4 @@ const JobDiscoveryFeed: React.FC<JobDiscoveryFeedProps> = ({
 };
 
 export default JobDiscoveryFeed;
+

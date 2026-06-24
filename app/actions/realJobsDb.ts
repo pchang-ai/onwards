@@ -4,7 +4,7 @@ export interface RealJob {
   link: string;
   location: string;
   postDate: string;
-  source: 'LinkedIn' | 'Ladders';
+  source: 'LinkedIn' | 'Ladders' | 'Wellfound' | 'Built In' | 'We Work Remotely';
 }
 
 export const REAL_JOBS_DB: RealJob[] = [
@@ -33,7 +33,7 @@ export const REAL_JOBS_DB: RealJob[] = [
     "source": "LinkedIn"
   },
   {
-    "title": "VP, AI &amp; Applications",
+    "title": "VP, AI &amp Applications",
     "company": "Utilidata",
     "link": "https://www.linkedin.com/jobs/view/vp-ai-applications-at-utilidata-4412976062?position=4&pageNum=0&refId=wIq0E8jU7W0BOAE7dRyuHQ%3D%3D&trackingId=7qlXbj10N0gaPyuXfK8YSg%3D%3D",
     "location": "Ann Arbor, MI",
@@ -49,7 +49,7 @@ export const REAL_JOBS_DB: RealJob[] = [
     "source": "LinkedIn"
   },
   {
-    "title": "VP, AI Innovation &amp; Enablement Leader",
+    "title": "VP, AI Innovation &amp Enablement Leader",
     "company": "LPL Financial",
     "link": "https://www.linkedin.com/jobs/view/vp-ai-innovation-enablement-leader-at-lpl-financial-4398053080?position=6&pageNum=0&refId=wIq0E8jU7W0BOAE7dRyuHQ%3D%3D&trackingId=rExWttdWHPaqMkM38eQfZg%3D%3D",
     "location": "San Diego, CA",
@@ -113,7 +113,7 @@ export const REAL_JOBS_DB: RealJob[] = [
     "source": "Ladders"
   },
   {
-    "title": "Director of Machine Learning &amp; Artificial Intelligence",
+    "title": "Director of Machine Learning &amp Artificial Intelligence",
     "company": "Domino's",
     "link": "https://www.linkedin.com/jobs/view/director-of-machine-learning-artificial-intelligence-at-domino-s-4427362453?position=7&pageNum=0&refId=V0Reo2mDHbPBVXMOxr7KAg%3D%3D&trackingId=3%2FyoCJEDlm7cMmMgdgco%2Bw%3D%3D",
     "location": "Ann Arbor, MI",
@@ -345,7 +345,7 @@ export const REAL_JOBS_DB: RealJob[] = [
     "source": "LinkedIn"
   },
   {
-    "title": "Data Science &amp; Machine Learning Product Manager - 254831",
+    "title": "Data Science &amp Machine Learning Product Manager - 254831",
     "company": "Medix Technology",
     "link": "https://www.linkedin.com/jobs/view/data-science-machine-learning-product-manager-254831-at-medix-technology-4426829799?position=8&pageNum=0&refId=lMGGr9e3Wu%2BaW5IC1APuDg%3D%3D&trackingId=QQvfo0lKXnl4uDW2lgeBFg%3D%3D",
     "location": "United States",
@@ -426,7 +426,7 @@ export const REAL_JOBS_DB: RealJob[] = [
   },
   {
     "title": "Software Engineer / Front End Web Developer",
-    "company": "Room &amp; Board",
+    "company": "Room &amp Board",
     "link": "https://www.linkedin.com/jobs/view/software-engineer-front-end-web-developer-at-room-board-4406100967?position=9&pageNum=0&refId=MUYkmtBNZVieh%2BVlIyvAHw%3D%3D&trackingId=UGJGijVpIEwTId%2B1q9wzCw%3D%3D",
     "location": "Golden Valley, MN",
     "postDate": "2 months ago",
@@ -567,5 +567,117 @@ export const REAL_JOBS_DB: RealJob[] = [
     "location": "New York, NY",
     "postDate": "23 hours ago",
     "source": "Ladders"
+  },
+  {
+    "title": "Software Engineer",
+    "company": "The Prompt Academy",
+    "link": "https://wellfound.com/jobs",
+    "location": "Remote",
+    "postDate": "1 day ago",
+    "source": "Wellfound"
+  },
+  {
+    "title": "Software Engineer",
+    "company": "FutureFit AI",
+    "link": "https://wellfound.com/jobs",
+    "location": "New York, NY",
+    "postDate": "3 days ago",
+    "source": "Wellfound"
+  },
+  {
+    "title": "Fullstack Software Engineer (Applied AI)",
+    "company": "Mercor",
+    "link": "https://wellfound.com/jobs",
+    "location": "San Francisco, CA",
+    "postDate": "2 days ago",
+    "source": "Wellfound"
+  },
+  {
+    "title": "Staff Software Engineer, Full-Stack (Enterprise Gen AI)",
+    "company": "Scale AI",
+    "link": "https://wellfound.com/jobs",
+    "location": "San Francisco, CA",
+    "postDate": "1 day ago",
+    "source": "Wellfound"
+  },
+  {
+    "title": "Frontend Systems Engineer",
+    "company": "DeepSense",
+    "link": "https://wellfound.com/jobs",
+    "location": "Remote",
+    "postDate": "1 week ago",
+    "source": "Wellfound"
+  },
+  {
+    "title": "Frontend Software Engineer",
+    "company": "Edison Scientific",
+    "link": "https://wellfound.com/jobs",
+    "location": "San Francisco, CA",
+    "postDate": "4 days ago",
+    "source": "Wellfound"
+  },
+  {
+    "title": "Senior AI Frontend Engineer",
+    "company": "Alka",
+    "link": "https://wellfound.com/jobs",
+    "location": "New York, NY",
+    "postDate": "5 days ago",
+    "source": "Wellfound"
+  },
+  {
+    "title": "Senior Frontend Software Engineer",
+    "company": "Bestow",
+    "link": "https://builtin.com/jobs",
+    "location": "Dallas, TX",
+    "postDate": "3 days ago",
+    "source": "Built In"
+  },
+  {
+    "title": "Full-Stack Software Engineer",
+    "company": "ARB Interactive",
+    "link": "https://builtin.com/jobs",
+    "location": "Chicago, IL",
+    "postDate": "2 days ago",
+    "source": "Built In"
+  },
+  {
+    "title": "Backend Software Engineer",
+    "company": "Hex",
+    "link": "https://builtin.com/jobs",
+    "location": "San Francisco, CA",
+    "postDate": "1 week ago",
+    "source": "Built In"
+  },
+  {
+    "title": "Full-Stack Software Engineer",
+    "company": "Cedar",
+    "link": "https://builtin.com/jobs",
+    "location": "New York, NY",
+    "postDate": "5 days ago",
+    "source": "Built In"
+  },
+  {
+    "title": "Backend Engineer",
+    "company": "Vannevar",
+    "link": "https://builtin.com/jobs",
+    "location": "Washington, DC",
+    "postDate": "4 days ago",
+    "source": "Built In"
+  },
+  {
+    "title": "Software Engineer",
+    "company": "Deepgram",
+    "link": "https://builtin.com/jobs",
+    "location": "Remote",
+    "postDate": "2 days ago",
+    "source": "Built In"
+  },
+  {
+    "title": "AI Engineer",
+    "company": "Upstart",
+    "link": "https://builtin.com/jobs",
+    "location": "San Mateo, CA",
+    "postDate": "6 days ago",
+    "source": "Built In"
   }
 ];
