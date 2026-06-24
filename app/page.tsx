@@ -242,6 +242,14 @@ export default function Home() {
 
   const [isGoogleConnecting, setIsGoogleConnecting] = useState(false);
 
+  // Forgot Password flow states
+
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
+
+  const [newPasswordInput, setNewPasswordInput] = useState("");
+
+  const [resetSuccessMessage, setResetSuccessMessage] = useState("");
+
   // Custom Category Text Inputs
 
   const [customCategoryEditInput, setCustomCategoryEditInput] = useState("");
@@ -969,6 +977,32 @@ export default function Home() {
 
       setRhythmStep("archetype");
     }
+  };
+
+  const handleResetPassword = (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthError(null);
+    setResetSuccessMessage("");
+
+    if (!emailInput || !newPasswordInput) {
+      setAuthError("Please complete all inputs.");
+      return;
+    }
+
+    const email = emailInput.trim().toLowerCase();
+    const users = JSON.parse(localStorage.getItem("onwards_users") || "{}");
+
+    if (!users[email]) {
+      setAuthError("No account found with this email. Please sign up first.");
+      return;
+    }
+
+    users[email] = newPasswordInput;
+    localStorage.setItem("onwards_users", JSON.stringify(users));
+
+    setResetSuccessMessage("Password reset successfully! You can now sign in.");
+    setPasswordInput("");
+    setNewPasswordInput("");
   };
 
   const handleSignOut = () => {
@@ -2008,7 +2042,7 @@ export default function Home() {
           <div className="w-full max-w-6xl mx-auto flex flex-col items-center pt-8 animate-in fade-in duration-500 select-none">
             {/* 1. AUTH STEP */}
 
-            {rhythmStep === "auth" && (
+            {rhythmStep === "auth" && !isForgotPassword && (
               <div className="w-full max-w-md bg-[#0e2018]/50 rounded-3xl p-8 backdrop-blur-sm shadow-2xl mt-12">
                 <div className="text-center mb-8">
                   <div className="inline-flex h-12 w-12 rounded-2xl bg-gradient-to-tr from-emerald-800 via-emerald-700 to-teal-700 items-center justify-center mb-4 shadow-[0_0_15px_rgba(16,185,129,0.3)] animate-bounce">
@@ -2060,9 +2094,23 @@ export default function Home() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-1.5">
-                      Password
-                    </label>
+                    <div className="flex justify-between items-center mb-1.5">
+                      <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest">
+                        Password
+                      </label>
+                      {!isSignUp && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsForgotPassword(true);
+                            setAuthError(null);
+                          }}
+                          className="text-[10px] text-emerald-450 hover:underline font-medium"
+                        >
+                          Forgot Password?
+                        </button>
+                      )}
+                    </div>
 
                     <input
                       type="password"
@@ -2089,6 +2137,99 @@ export default function Home() {
                     {isSignUp
                       ? "Already have an account? Sign In"
                       : "First time? Create a New Account"}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {rhythmStep === "auth" && isForgotPassword && (
+              <div className="w-full max-w-md bg-[#0e2018]/50 rounded-3xl p-8 backdrop-blur-sm shadow-2xl mt-12">
+                <div className="text-center mb-8">
+                  <div className="inline-flex h-12 w-12 rounded-2xl bg-gradient-to-tr from-emerald-800 via-emerald-700 to-teal-700 items-center justify-center mb-4 shadow-[0_0_15px_rgba(16,185,129,0.3)] animate-bounce">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-6 w-6 text-white"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                      />
+                    </svg>
+                  </div>
+
+                  <h3 className="text-2xl font-black text-white tracking-tight">
+                    Reset Account Password
+                  </h3>
+
+                  <p className="text-sm text-slate-400 mt-2 font-light">
+                    Enter your email and your new desired password to update your login credentials.
+                  </p>
+                </div>
+
+                <form onSubmit={handleResetPassword} className="space-y-4">
+                  {authError && (
+                    <div className="p-3 text-xs font-bold text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-xl">
+                      {authError}
+                    </div>
+                  )}
+
+                  {resetSuccessMessage && (
+                    <div className="p-3 text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-xl">
+                      {resetSuccessMessage}
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-1.5">
+                      Email Address
+                    </label>
+
+                    <input
+                      type="email"
+                      placeholder="e.g. parent@onwards.com"
+                      value={emailInput}
+                      onChange={(e) => setEmailInput(e.target.value)}
+                      className="w-full px-4 py-2.5 bg-[#06100c] rounded-xl text-sm text-slate-200 focus:outline-none focus:border-emerald-600 transition-colors"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-1.5">
+                      New Password
+                    </label>
+
+                    <input
+                      type="password"
+                      placeholder="New Password"
+                      value={newPasswordInput}
+                      onChange={(e) => setNewPasswordInput(e.target.value)}
+                      className="w-full px-4 py-2.5 bg-[#06100c] rounded-xl text-sm text-slate-200 focus:outline-none focus:border-emerald-600 transition-colors"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full py-3 bg-[#1b4332] hover:bg-[#2d6a4f] border border-[#40916c]/30 text-[#F4F4F0] font-bold text-xs uppercase tracking-widest rounded-xl transition-all shadow-lg"
+                  >
+                    Update Password
+                  </button>
+                </form>
+
+                <div className="mt-6 pt-6 border-t border-emerald-950/20 text-center">
+                  <button
+                    onClick={() => {
+                      setIsForgotPassword(false);
+                      setAuthError(null);
+                      setResetSuccessMessage("");
+                    }}
+                    className="text-xs text-emerald-450 hover:underline font-bold uppercase tracking-wider"
+                  >
+                    &larr; Back to Sign In
                   </button>
                 </div>
               </div>

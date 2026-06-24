@@ -50,15 +50,15 @@ You are an expert AI calendar architect for the Onwards transition platform.
 Your task is to generate a highly customized weekly schedule (Monday to Friday, 5 days. For each day, there are 9 time slots: "05:00-07:00", "07:00-09:00", "09:00-11:00", "11:00-13:00", "13:00-15:00", "15:00-17:00", "17:00-19:00", "19:00-21:00", "21:00-23:00").
 
 User Profile:
-- Archetype: ${profile.archetype}
-- Extra Details: ${profile.details}
+- Archetype: ${profile.archetype || "transitioner"}
+- Extra Details: ${profile.details || ""}
 - Custom Questionnaire: 
   * Work Status: ${profile.customAnswers?.isWorking || "N/A"}
   * Other Commitments: ${profile.customAnswers?.hasCommitments ? "Yes" : "No"} ${profile.customAnswers?.commitmentsDetails ? `(${profile.customAnswers.commitmentsDetails})` : ""}
   * Professional Experience: ${profile.customAnswers?.yearsExperience || "N/A"} years
   * Back-burner items to address: ${profile.customAnswers?.backBurnerTasks || "None"}
-- Always Busy / Committed Slots (Unavailable): ${profile.busyBlocks.join(", ") || "None"} (DO NOT schedule active transition tasks here. For these slots, you MUST return title "Committed Time" under category "life operations" and description "Blocked for employment, caregiving, or critical personal commitments.")
-- Peak Productivity Slots: ${profile.peakBlocks.join(", ") || "None"} (schedule high-value "career" focus tasks or intensive "learning" exercises here)
+- Always Busy / Committed Slots (Unavailable): ${(profile.busyBlocks || []).join(", ") || "None"} (DO NOT schedule active transition tasks here. For these slots, you MUST return title "Committed Time" under category "life operations" and description "Blocked for employment, caregiving, or critical personal commitments.")
+- Peak Productivity Slots: ${(profile.peakBlocks || []).join(", ") || "None"} (schedule high-value "career" focus tasks or intensive "learning" exercises here)
 
 Rules:
 1. Generate exactly 45 events (one for each combination of the 5 days and 9 timeSlots).
@@ -131,7 +131,7 @@ Rules:
   ];
   const events: CalendarEvent[] = [];
 
-  const detailsText = profile.details.toLowerCase();
+  const detailsText = (profile.details || "").toLowerCase();
   
   // Custom topic extraction based on user input
   const learnTopic = detailsText.includes("next.js") || detailsText.includes("nextjs")
@@ -153,8 +153,8 @@ Rules:
   days.forEach((day, dIdx) => {
     timeSlots.forEach((slot, sIdx) => {
       const blockId = `${day}-${slot}`;
-      const isBusy = profile.busyBlocks.includes(blockId);
-      const isPeak = profile.peakBlocks.includes(blockId);
+      const isBusy = (profile.busyBlocks || []).includes(blockId);
+      const isPeak = (profile.peakBlocks || []).includes(blockId);
 
       if (isBusy) {
         // Check if this slot was mock Google-synced (e.g. Monday 09:00-11:00, Wednesday 15:00-17:00, Friday 11:00-13:00)
