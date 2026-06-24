@@ -190,7 +190,11 @@ export default function Home() {
     backBurnerTasks: "",
   });
 
-  const [busyBlocks, setBusyBlocks] = useState<string[]>([]); // Array of "Day-slot" (e.g. "Monday-07:00-09:00")
+  const [busyBlocks, setBusyBlocks] = useState<string[]>([
+    "Monday-09:00-11:00",
+    "Wednesday-15:00-17:00",
+    "Friday-11:00-13:00",
+  ]); // Array of "Day-slot" (e.g. "Monday-07:00-09:00")
 
   const [peakBlocks, setPeakBlocks] = useState<string[]>([]); // Array of "Day-slot" (e.g. "Monday-09:00-11:00")
 
@@ -230,11 +234,11 @@ export default function Home() {
 
   // Google account sync simulation state
 
-  const [syncGoogleCalendar, setSyncGoogleCalendar] = useState(false);
+  const [syncGoogleCalendar, setSyncGoogleCalendar] = useState(true);
 
   const [syncGmail, setSyncGmail] = useState(false);
 
-  const [isGoogleConnected, setIsGoogleConnected] = useState(false);
+  const [isGoogleConnected, setIsGoogleConnected] = useState(true);
 
   const [isGoogleConnecting, setIsGoogleConnecting] = useState(false);
 
@@ -652,13 +656,35 @@ export default function Home() {
 
         setArchetypeDetails(profile.details);
 
-        setBusyBlocks(profile.busyBlocks);
+        setBusyBlocks(profile.busyBlocks || []);
 
         setPeakBlocks(profile.peakBlocks || []);
 
         if (profile.customAnswers) {
           setCustomAnswers(profile.customAnswers);
         }
+
+        setIsGoogleConnected(
+          profile.isGoogleConnected !== undefined
+            ? profile.isGoogleConnected
+            : true,
+        );
+
+        setSyncGoogleCalendar(
+          profile.syncGoogleCalendar !== undefined
+            ? profile.syncGoogleCalendar
+            : true,
+        );
+      } else {
+        setIsGoogleConnected(true);
+
+        setSyncGoogleCalendar(true);
+
+        setBusyBlocks([
+          "Monday-09:00-11:00",
+          "Wednesday-15:00-17:00",
+          "Friday-11:00-13:00",
+        ]);
       }
 
       // Load streak and logged days
@@ -706,245 +732,7 @@ export default function Home() {
 
     const email = emailInput.trim().toLowerCase();
 
-    // Seeded accounts check (bypass lookup DB if correct password used)
-
-    const seededAccounts = [
-      "transitioner@onwards.com",
-      "parent@onwards.com",
-      "consultant@onwards.com",
-    ];
-
-    const isSeededEmail = seededAccounts.includes(email);
-
     if (!isSignUp) {
-      // Login Flow
-
-      if (isSeededEmail) {
-        if (passwordInput !== "password") {
-          setAuthError("Incorrect password for seeded account.");
-
-          return;
-        }
-
-        setSignedInUser(email);
-
-        localStorage.setItem("onwards_active_session", email);
-
-        if (email === "transitioner@onwards.com") {
-          const seededProfile = {
-            archetype: "transitioner",
-
-            details:
-              "Dedicating full time to a major tech career pivot. Aiming for FIRE and learning Next.js.",
-
-            busyBlocks: [],
-
-            peakBlocks: [
-              "Monday-09:00-11:00",
-
-              "Tuesday-09:00-11:00",
-
-              "Wednesday-09:00-11:00",
-
-              "Thursday-09:00-11:00",
-
-              "Friday-09:00-11:00",
-            ],
-
-            customAnswers: {
-              isWorking: "Not working",
-
-              hasCommitments: false,
-
-              commitmentsDetails: "",
-
-              yearsExperience: "6-10 years",
-
-              backBurnerTasks: "Set up investment trust",
-            },
-          };
-
-          setSelectedArchetype("transitioner");
-
-          setArchetypeDetails(seededProfile.details);
-
-          setBusyBlocks([]);
-
-          setPeakBlocks(seededProfile.peakBlocks);
-
-          setCustomAnswers(seededProfile.customAnswers);
-
-          localStorage.setItem(
-            `onwards_profile_${email}`,
-            JSON.stringify(seededProfile),
-          );
-
-          setIsGeneratingEvents(true);
-
-          generateSchedule(seededProfile).then((events) => {
-            setWeeklyEvents(events);
-
-            localStorage.setItem(
-              `onwards_schedule_${email}`,
-              JSON.stringify(events),
-            );
-
-            setIsGeneratingEvents(false);
-
-            setRhythmStep("weekly_schedule");
-          });
-        } else if (email === "parent@onwards.com") {
-          const seededProfile = {
-            archetype: "parent",
-
-            details:
-              "Parent balancing household chores and caregiving. Aiming to learn visual AI tools and prompt engineering.",
-
-            busyBlocks: [
-              "Monday-07:00-09:00",
-              "Monday-09:00-11:00",
-
-              "Tuesday-07:00-09:00",
-              "Tuesday-09:00-11:00",
-
-              "Wednesday-07:00-09:00",
-              "Wednesday-09:00-11:00",
-
-              "Thursday-07:00-09:00",
-              "Thursday-09:00-11:00",
-
-              "Friday-07:00-09:00",
-              "Friday-09:00-11:00",
-            ],
-
-            peakBlocks: [
-              "Monday-19:00-21:00",
-
-              "Tuesday-19:00-21:00",
-
-              "Wednesday-19:00-21:00",
-
-              "Thursday-19:00-21:00",
-
-              "Friday-19:00-21:00",
-            ],
-
-            customAnswers: {
-              isWorking: "Part-time",
-
-              hasCommitments: true,
-
-              commitmentsDetails: "Caring for toddler and school runs",
-
-              yearsExperience: "10+ years",
-
-              backBurnerTasks: "Fix garage door and replace kitchen lights",
-            },
-          };
-
-          setSelectedArchetype("parent");
-
-          setArchetypeDetails(seededProfile.details);
-
-          setBusyBlocks(seededProfile.busyBlocks);
-
-          setPeakBlocks(seededProfile.peakBlocks);
-
-          setCustomAnswers(seededProfile.customAnswers);
-
-          localStorage.setItem(
-            `onwards_profile_${email}`,
-            JSON.stringify(seededProfile),
-          );
-
-          setIsGeneratingEvents(true);
-
-          generateSchedule(seededProfile).then((events) => {
-            setWeeklyEvents(events);
-
-            localStorage.setItem(
-              `onwards_schedule_${email}`,
-              JSON.stringify(events),
-            );
-
-            setIsGeneratingEvents(false);
-
-            setRhythmStep("weekly_schedule");
-          });
-        } else if (email === "consultant@onwards.com") {
-          const seededProfile = {
-            archetype: "consultant",
-
-            details:
-              "Independent consultant balancing multiple client streams. Building vector queries and databases.",
-
-            busyBlocks: [
-              "Wednesday-09:00-11:00",
-
-              "Wednesday-11:00-13:00",
-
-              "Wednesday-13:00-15:00",
-
-              "Wednesday-15:00-17:00",
-            ],
-
-            peakBlocks: [
-              "Monday-13:00-15:00",
-
-              "Tuesday-13:00-15:00",
-
-              "Thursday-13:00-15:00",
-
-              "Friday-13:00-15:00",
-            ],
-
-            customAnswers: {
-              isWorking: "Full-time",
-
-              hasCommitments: false,
-
-              commitmentsDetails: "",
-
-              yearsExperience: "10+ years",
-
-              backBurnerTasks: "Establish estate trust document",
-            },
-          };
-
-          setSelectedArchetype("consultant");
-
-          setArchetypeDetails(seededProfile.details);
-
-          setBusyBlocks(seededProfile.busyBlocks);
-
-          setPeakBlocks(seededProfile.peakBlocks);
-
-          setCustomAnswers(seededProfile.customAnswers);
-
-          localStorage.setItem(
-            `onwards_profile_${email}`,
-            JSON.stringify(seededProfile),
-          );
-
-          setIsGeneratingEvents(true);
-
-          generateSchedule(seededProfile).then((events) => {
-            setWeeklyEvents(events);
-
-            localStorage.setItem(
-              `onwards_schedule_${email}`,
-              JSON.stringify(events),
-            );
-
-            setIsGeneratingEvents(false);
-
-            setRhythmStep("weekly_schedule");
-          });
-        }
-
-        return;
-      }
-
       // Check registered users
 
       const users = JSON.parse(localStorage.getItem("onwards_users") || "{}");
@@ -966,11 +754,23 @@ export default function Home() {
 
             setArchetypeDetails(profile.details);
 
-            setBusyBlocks(profile.busyBlocks);
+            setBusyBlocks(profile.busyBlocks || []);
 
             setPeakBlocks(profile.peakBlocks || []);
 
             if (profile.customAnswers) setCustomAnswers(profile.customAnswers);
+
+            setIsGoogleConnected(
+              profile.isGoogleConnected !== undefined
+                ? profile.isGoogleConnected
+                : true,
+            );
+
+            setSyncGoogleCalendar(
+              profile.syncGoogleCalendar !== undefined
+                ? profile.syncGoogleCalendar
+                : true,
+            );
           } else {
             // Reset to defaults if profile is missing
 
@@ -978,21 +778,44 @@ export default function Home() {
 
             setArchetypeDetails("");
 
-            setBusyBlocks([]);
+            setBusyBlocks([
+              "Monday-09:00-11:00",
+              "Wednesday-15:00-17:00",
+              "Friday-11:00-13:00",
+            ]);
 
             setPeakBlocks([]);
 
-            setCustomAnswers({
-              isWorking: "Not working",
+            setIsGoogleConnected(true);
 
-              hasCommitments: false,
+            setSyncGoogleCalendar(true);
 
-              commitmentsDetails: "",
+            const newProfile = {
+              archetype: "transitioner",
+              details: "",
+              busyBlocks: [
+                "Monday-09:00-11:00",
+                "Wednesday-15:00-17:00",
+                "Friday-11:00-13:00",
+              ],
+              peakBlocks: [],
+              customAnswers: {
+                isWorking: "Not working",
+                hasCommitments: false,
+                commitmentsDetails: "",
+                yearsExperience: "0-2 years",
+                backBurnerTasks: "",
+              },
+              isGoogleConnected: true,
+              syncGoogleCalendar: true,
+            };
 
-              yearsExperience: "0-2 years",
+            localStorage.setItem(
+              `onwards_profile_${email}`,
+              JSON.stringify(newProfile),
+            );
 
-              backBurnerTasks: "",
-            });
+            setCustomAnswers(newProfile.customAnswers);
           }
 
           // Load schedule
@@ -1016,14 +839,6 @@ export default function Home() {
       }
     } else {
       // Sign Up Flow
-
-      if (isSeededEmail) {
-        setAuthError(
-          "This email address is reserved for demo seeded accounts. Please sign in instead.",
-        );
-
-        return;
-      }
 
       const users = JSON.parse(localStorage.getItem("onwards_users") || "{}");
 
@@ -1051,21 +866,44 @@ export default function Home() {
 
       setArchetypeDetails("");
 
-      setBusyBlocks([]);
+      setBusyBlocks([
+        "Monday-09:00-11:00",
+        "Wednesday-15:00-17:00",
+        "Friday-11:00-13:00",
+      ]);
 
       setPeakBlocks([]);
 
-      setCustomAnswers({
-        isWorking: "Not working",
+      setIsGoogleConnected(true);
 
-        hasCommitments: false,
+      setSyncGoogleCalendar(true);
 
-        commitmentsDetails: "",
+      const newProfile = {
+        archetype: "transitioner",
+        details: "",
+        busyBlocks: [
+          "Monday-09:00-11:00",
+          "Wednesday-15:00-17:00",
+          "Friday-11:00-13:00",
+        ],
+        peakBlocks: [],
+        customAnswers: {
+          isWorking: "Not working",
+          hasCommitments: false,
+          commitmentsDetails: "",
+          yearsExperience: "0-2 years",
+          backBurnerTasks: "",
+        },
+        isGoogleConnected: true,
+        syncGoogleCalendar: true,
+      };
 
-        yearsExperience: "0-2 years",
+      localStorage.setItem(
+        `onwards_profile_${email}`,
+        JSON.stringify(newProfile),
+      );
 
-        backBurnerTasks: "",
-      });
+      setCustomAnswers(newProfile.customAnswers);
 
       setWeeklyEvents([]);
 
@@ -1093,6 +931,16 @@ export default function Home() {
     setHasLoggedToday(false);
 
     setLoggedDays([]);
+
+    setBusyBlocks([
+      "Monday-09:00-11:00",
+      "Wednesday-15:00-17:00",
+      "Friday-11:00-13:00",
+    ]);
+
+    setIsGoogleConnected(true);
+
+    setSyncGoogleCalendar(true);
   };
 
   const handleUploadComplete = async (metrics?: Metric[], roles?: Role[]) => {
@@ -1246,6 +1094,10 @@ export default function Home() {
       peakBlocks: peakBlocks,
 
       customAnswers: selectedArchetype === "custom" ? customAnswers : undefined,
+
+      isGoogleConnected: isGoogleConnected,
+
+      syncGoogleCalendar: syncGoogleCalendar,
     };
 
     try {
@@ -2178,14 +2030,6 @@ export default function Home() {
                       ? "Already have an account? Sign In"
                       : "First time? Create a New Account"}
                   </button>
-
-                  <div className="mt-4 text-[10px] text-slate-400 font-light leading-relaxed bg-[#06100c]/40 p-3 rounded-xl ">
-                    <span className="font-semibold block mb-1 text-slate-400 uppercase tracking-wider">
-                      Demo Seed Accounts (Password: "password"):
-                    </span>
-                    • parent@onwards.com (childcare + side contract)
-                    <br />• transitioner@onwards.com (full-time career pivot)
-                  </div>
                 </div>
               </div>
             )}
@@ -2676,9 +2520,32 @@ export default function Home() {
                         <input
                           type="checkbox"
                           checked={syncGoogleCalendar}
-                          onChange={(e) =>
-                            setSyncGoogleCalendar(e.target.checked)
-                          }
+                          onChange={(e) => {
+                            const checked = e.target.checked;
+                            setSyncGoogleCalendar(checked);
+                            if (checked) {
+                              setBusyBlocks((prev) => {
+                                const slotsToAdd = [
+                                  "Monday-09:00-11:00",
+                                  "Wednesday-15:00-17:00",
+                                  "Friday-11:00-13:00",
+                                ];
+                                const unique = new Set([...prev, ...slotsToAdd]);
+                                return Array.from(unique);
+                              });
+                            } else {
+                              setBusyBlocks((prev) =>
+                                prev.filter(
+                                  (slot) =>
+                                    ![
+                                      "Monday-09:00-11:00",
+                                      "Wednesday-15:00-17:00",
+                                      "Friday-11:00-13:00",
+                                    ].includes(slot),
+                                ),
+                              );
+                            }
+                          }}
                           className="h-4 w-4 rounded border-slate-800 bg-[#06100c] text-emerald-600 focus:ring-0"
                         />
 
@@ -2717,7 +2584,7 @@ export default function Home() {
 
                           <p className="text-[10px] text-slate-400 font-light mt-0.5">
                             {isGoogleConnected
-                              ? "Synced as active.user@gmail.com"
+                              ? `Synced as ${signedInUser || "user@gmail.com"}`
                               : "No active connection"}
                           </p>
                         </div>
@@ -2732,6 +2599,17 @@ export default function Home() {
                             setSyncGoogleCalendar(false);
 
                             setSyncGmail(false);
+
+                            setBusyBlocks((prev) =>
+                              prev.filter(
+                                (slot) =>
+                                  ![
+                                    "Monday-09:00-11:00",
+                                    "Wednesday-15:00-17:00",
+                                    "Friday-11:00-13:00",
+                                  ].includes(slot),
+                              ),
+                            );
                           } else {
                             setIsGoogleConnecting(true);
 
@@ -2743,6 +2621,16 @@ export default function Home() {
                               setSyncGoogleCalendar(true);
 
                               setSyncGmail(true);
+
+                              setBusyBlocks((prev) => {
+                                const slotsToAdd = [
+                                  "Monday-09:00-11:00",
+                                  "Wednesday-15:00-17:00",
+                                  "Friday-11:00-13:00",
+                                ];
+                                const unique = new Set([...prev, ...slotsToAdd]);
+                                return Array.from(unique);
+                              });
                             }, 1000);
                           }
                         }}
@@ -2787,12 +2675,11 @@ export default function Home() {
               <div className="w-full max-w-4xl flex flex-col items-center animate-in fade-in duration-500">
                 <section className="text-center mb-8">
                   <h3 className="text-3xl font-black text-white tracking-tight">
-                    Block out Unavailable Slots
+                    Customize your time slots
                   </h3>
 
                   <p className="text-sm text-slate-400 mt-2 font-light">
-                    Toggle slots where you are always busy (childcare, existing
-                    jobs). Then, select your peak productivity window.
+                    Toggle slots where you are always busy (unavailable) or select your peak productivity windows.
                   </p>
                 </section>
 
@@ -2807,7 +2694,7 @@ export default function Home() {
                         </p>
 
                         <p className="text-[10px] text-slate-400 font-light mt-0.5">
-                          Imported 3 busy meetings from active.user@gmail.com
+                          Imported 3 busy meetings from {signedInUser || "user@gmail.com"}{" "}
                           (Monday 9am, Wednesday 3pm, Friday 11am).
                         </p>
                       </div>
@@ -2985,7 +2872,7 @@ export default function Home() {
                   >
                     {isGeneratingEvents
                       ? "Running AI Planner..."
-                      : "Generate AI Weekly Rhythm &rarr;"}
+                      : "Generate AI Weekly Rhythm"}
                   </button>
                 </div>
               </div>

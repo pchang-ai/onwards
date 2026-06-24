@@ -22,6 +22,8 @@ export interface ProfileData {
     yearsExperience?: string;
     backBurnerTasks?: string;
   };
+  isGoogleConnected?: boolean;
+  syncGoogleCalendar?: boolean;
 }
 
 export async function generateSchedule(profile: ProfileData): Promise<CalendarEvent[]> {
