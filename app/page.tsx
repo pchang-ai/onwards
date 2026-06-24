@@ -390,12 +390,72 @@ export default function Home() {
 
   // Maps episode IDs to real, fast-loading, public test MP3 files
   const getAudioTrackUrl = (episodeId: string): string => {
-    if (episodeId.includes("-1")) return "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
-    if (episodeId.includes("-2")) return "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3";
-    if (episodeId.includes("-3")) return "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3";
-    if (episodeId.includes("-4")) return "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3";
-    if (episodeId.includes("-5")) return "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3";
-    return "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
+    switch (episodeId) {
+      // AI Daily Brief
+      case "ep-1-1":
+        return "https://anchor.fm/s/f7cac464/podcast/play/121901656/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-5-23%2F426705102-44100-2-93552e1c81a4.mp3";
+      case "ep-1-2":
+        return "https://anchor.fm/s/f7cac464/podcast/play/121847804/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-5-22%2F426632470-44100-2-1fd697f62d833.mp3";
+      case "ep-1-3":
+        return "https://anchor.fm/s/f7cac464/podcast/play/121551135/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-5-16%2F426238037-44100-2-237b0353b5dee.mp3";
+      case "ep-1-4":
+        return "https://anchor.fm/s/f7cac464/podcast/play/121785944/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-5-21%2F426551944-44100-2-eace034712683.mp3";
+      case "ep-1-5":
+        return "https://anchor.fm/s/f7cac464/podcast/play/121431520/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-5-13%2F426078004-44100-2-afc677ace59fa.mp3";
+      case "ep-1-6":
+        return "https://anchor.fm/s/f7cac464/podcast/play/121461623/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-5-14%2F426117624-44100-2-4aafec7a23989.mp3";
+
+      // How I AI
+      case "ep-2-1":
+        return "https://anchor.fm/s/1035b1568/podcast/play/121855817/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-5-22%2F426644175-44100-2-dd74844c37894.mp3";
+      case "ep-2-2":
+        return "https://anchor.fm/s/1035b1568/podcast/play/121667681/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-5-18%2F426415106-44100-2-515c5cbd0b1ad.mp3";
+      case "ep-2-3":
+        return "https://anchor.fm/s/1035b1568/podcast/play/121559197/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-5-16%2F426259555-44100-2-1b61a314a7bc8.mp3";
+      case "ep-2-4":
+        return "https://anchor.fm/s/1035b1568/podcast/play/121201190/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-5-9%2F425771285-44100-2-d91dab8395c07.mp3";
+      case "ep-2-5":
+        return "https://anchor.fm/s/1035b1568/podcast/play/121240644/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-5-9%2F425823246-44100-2-7eb52f340db5.mp3";
+
+      // Practical AI
+      case "ep-3-1":
+        return "https://pscrb.fm/rss/p/dts.podtrac.com/redirect.mp3/media.transistor.fm/5c1a087d/89d77a53.mp3";
+      case "ep-3-2":
+        return "https://pscrb.fm/rss/p/dts.podtrac.com/redirect.mp3/media.transistor.fm/302b36f8/d474795e.mp3";
+      case "ep-3-3":
+        return "https://pscrb.fm/rss/p/dts.podtrac.com/redirect.mp3/media.transistor.fm/d76e02d5/e934139b.mp3";
+      case "ep-3-4":
+        return "https://pscrb.fm/rss/p/dts.podtrac.com/redirect.mp3/media.transistor.fm/451da102/629a058c.mp3";
+      case "ep-3-5":
+        return "https://pscrb.fm/rss/p/dts.podtrac.com/redirect.mp3/media.transistor.fm/9ac73d0a/a5131751.mp3";
+
+      // AI Explained
+      case "ep-4-1":
+        return "https://www.buzzsprout.com/2418777/episodes/19343412-claude-fable-blocked-11-quiet-details-on-what-s-next.mp3";
+      case "ep-4-2":
+        return "https://www.buzzsprout.com/2418777/episodes/19327278-claude-fable-5-full-319-page-breakdown.mp3";
+      case "ep-4-3":
+        return "https://www.buzzsprout.com/2418777/episodes/19259425-new-claude-244-page-breakdown.mp3";
+      case "ep-4-4":
+        return "https://www.buzzsprout.com/2418777/episodes/19210251-two-rival-bets-on-agi-google-i-o-highlights.mp3";
+      case "ep-4-5":
+        return "https://www.buzzsprout.com/2418777/episodes/19072086-gpt-5-5-arrives-deepseek-v4-drops-and-the-compute-war-intensifies.mp3";
+
+      // NVIDIA AI Podcast
+      case "ep-5-1":
+        return "https://cohst.app/pdcst/9V4R8T/traffic.megaphone.fm/NVC6266348181.mp3";
+      case "ep-5-2":
+        return "https://cohst.app/pdcst/9V4R8T/traffic.megaphone.fm/NVC3974617522.mp3";
+      case "ep-5-3":
+        return "https://cohst.app/pdcst/9V4R8T/traffic.megaphone.fm/NVC9592437490.mp3";
+      case "ep-5-4":
+        return "https://cohst.app/pdcst/9V4R8T/traffic.megaphone.fm/NVC1708428495.mp3";
+      case "ep-5-5":
+        return "https://cohst.app/pdcst/9V4R8T/traffic.megaphone.fm/NVC2926487857.mp3";
+
+      default:
+        return "https://anchor.fm/s/f7cac464/podcast/play/121901656/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-5-23%2F426705102-44100-2-93552e1c81a4.mp3";
+    }
   };
 
   // Effect 1: Initialize HTML5 Audio and attach time/ended listeners
@@ -4682,13 +4742,23 @@ export default function Home() {
                                       )}
 
                                       <div className="min-w-0">
-                                        <h4 className="text-base font-extrabold text-slate-100 truncate leading-snug">
+                                        <a
+                                          href={`https://x.com/${account.handle.replace('@', '')}`}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="text-base font-extrabold text-slate-100 hover:text-sky-400 hover:underline transition-colors duration-200 truncate leading-snug block"
+                                        >
                                           {account.name}
-                                        </h4>
+                                        </a>
 
-                                        <p className="text-sm text-slate-450 truncate font-medium">
+                                        <a
+                                          href={`https://x.com/${account.handle.replace('@', '')}`}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="text-sm text-slate-450 hover:text-sky-400 hover:underline transition-colors duration-200 truncate font-medium block"
+                                        >
                                           {account.handle}
-                                        </p>
+                                        </a>
                                       </div>
                                     </div>
 
