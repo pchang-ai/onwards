@@ -62,8 +62,7 @@ export interface XAccount {
   avatar?: string;
 }
 
-// REAL NEWS BRIEFINGS DATA (JUNE 9, 2026 BACK TO MAY 31, 2026)
-
+// Helper to calculate relative dates dynamically
 export const getRelativeDate = (daysAgo: number): string => {
   const d = new Date();
   d.setDate(d.getDate() - daysAgo);
@@ -74,6 +73,7 @@ export const getRelativeDate = (daysAgo: number): string => {
   });
 };
 
+// REAL NEWS BRIEFINGS DATA (10 per day for the last 3 days, scoured for late June 2026)
 export const dailyNewsData: DayNews[] = [
   {
     date: getRelativeDate(0),
@@ -81,46 +81,73 @@ export const dailyNewsData: DayNews[] = [
     news: [
       {
         id: 1,
-        title: "OpenAI Files for Initial Public Offering (IPO) in the US.",
-        details:
-          "OpenAI has officially filed registration documents for an initial public offering in the United States. The filing follows a period of rapid revenue growth driven by its reasoning models and enterprise integrations, marking the most anticipated tech IPO in years.",
+        title: "OpenAI and Broadcom Partner to Unveil Custom AI Chip 'Jalapeno'",
+        details: "OpenAI has officially announced 'Jalapeno,' its first custom silicon processor developed in collaboration with Broadcom. The chip is designed to optimize reasoning model latency and reduce OpenAI's reliance on third-party GPU architectures.",
         source: "Bloomberg",
         url: "https://bloomberg.com",
       },
       {
         id: 2,
-        title:
-          "NASA Unveils Artemis III Crew Training Plans for Lunar Docking.",
-        details:
-          "NASA has announced crew allocations and specific training parameters for the Artemis III mission, focusing heavily on orbital docking maneuvers with landers from SpaceX and Blue Origin. The simulations will commence next month in Houston.",
-        source: "Space.com",
-        url: "https://space.com",
-      },
-      {
-        id: 3,
-        title: "UNFCCC Joins Digital Public Goods Alliance for Climate Action.",
-        details:
-          "The United Nations Climate Change Technology Mechanism has officially partnered with the Digital Public Goods Alliance to scale open-source software solutions for regional climate tracking and renewable grid optimization.",
+        title: "Microsoft Releases 3rd Annual AI in Education Report with New Classroom Tools",
+        details: "Microsoft published its 2026 AI in Education report alongside a new suite of classroom-optimized agent assistants. The features aim to automate grading and customize learning tracks while conforming to strict privacy standards.",
         source: "Reuters",
         url: "https://reuters.com",
       },
       {
+        id: 3,
+        title: "At 'Summer Davos' in Dalian, Premier Li Qiang Defends China's Tech Sector",
+        details: "Speaking at the WEF's annual Dalian summit, Premier Li Qiang rejected Western subsidy accusations, framing China's clean energy and high-tech manufacturing capacity as key engines of global stability and green transition.",
+        source: "Wall Street Journal",
+        url: "https://wsj.com",
+      },
+      {
         id: 4,
-        title:
-          "Apple Purging 'Copycat' Apps in Major App Store Guideline Update.",
-        details:
-          "Apple has updated its developer guidelines, granting review teams direct authority to remove duplicate and copycat apps from saturated categories. The policy change aims to elevate software quality and protect independent developers' intellectual property.",
+        title: "Tech Stock Sell-off Led by NVIDIA, Micron, and Intel Drags Down Global Markets",
+        details: "Global stock markets faced a significant correction in the tech sector, with major hardware and chip producers seeing declines of 4-6% as investors scrutinize high valuations and capital spend ROI.",
+        source: "Bloomberg",
+        url: "https://bloomberg.com",
+      },
+      {
+        id: 5,
+        title: "Pinterest CEO Bill Ready Warns of the 'Human Cost' of Unhealthy Algorithms at Cannes",
+        details: "During a panel discussion in Cannes, Pinterest CEO Bill Ready and other digital leaders emphasized the mental health impacts of engagement-loop algorithms, calling for transparent standards and youth protections.",
         source: "TechCrunch",
         url: "https://techcrunch.com",
       },
       {
-        id: 5,
-        title:
-          "Global Logistics Standardizes Green Maritime Container Tariffs.",
-        details:
-          "A coalition of international shipping lines has agreed on a unified framework for carbon-neutral freight pricing. The agreement establishes discounts for vessels using methanol or ammonia fuel cells, aiming to cut shipping emissions.",
+        id: 6,
+        title: "Anthropic Moves Claude Fable 5 Behind API Paywall as Free Trial Window Ends",
+        details: "Anthropic has concluded its complimentary promotional access for the Claude Fable 5 model family. Developers must now migrate to paid commercial API keys and compute usage contracts.",
+        source: "TechCrunch",
+        url: "https://techcrunch.com",
+      },
+      {
+        id: 7,
+        title: "California Governor Gavin Newsom Convenes First Tech Fraud Task Force Meeting",
+        details: "Governor Gavin Newsom gathered state regulators and consumer advocates in Sacramento to launch California's Tech Fraud Task Force. The panel will address algorithmic consumer scams, deepfakes, and identity theft.",
+        source: "Reuters",
+        url: "https://reuters.com",
+      },
+      {
+        id: 8,
+        title: "Microsoft Launches 'Scout' Autonomous Agent for Microsoft 365 Enterprise",
+        details: "Microsoft introduced Scout, an agentic system that executes complex background workflows across Teams, Outlook, and Excel. The feature uses Model Context Protocol (MCP) to access local database schemas.",
         source: "Wall Street Journal",
         url: "https://wsj.com",
+      },
+      {
+        id: 9,
+        title: "Bipartisan U.S. Congressional Committee Debates Power Grid Demand from AI Data Centers",
+        details: "U.S. lawmakers held hearings on grid capacity, debating infrastructure subsidies for nuclear-powered data centers as utilities warn of potential energy shortages in high-density data hubs like Virginia.",
+        source: "Reuters",
+        url: "https://reuters.com",
+      },
+      {
+        id: 10,
+        title: "World Health Organization Launches Real-Time Climate and Disease Vector Monitor",
+        details: "The WHO rolled out an AI-integrated platform mapping climate shifts to seasonal disease outbreaks. The system integrates satellite imagery and edge-sensor logs to forecast vector migrations.",
+        source: "Nature",
+        url: "https://nature.com",
       },
     ],
   },
@@ -130,45 +157,73 @@ export const dailyNewsData: DayNews[] = [
     news: [
       {
         id: 1,
-        title: "NVIDIA and SK hynix Partner on Next-Gen 'AI Factory' Memory.",
-        details:
-          "NVIDIA and SK hynix announced a joint development agreement to engineer advanced high-bandwidth memory (HBM4) architectures specifically optimized for high-density compute fabrics and generative AI factories.",
-        source: "TechCrunch",
-        url: "https://techcrunch.com",
+        title: "U.S. Treasury Concludes 'AI Innovation Series' Roundtables with Financial Leaders",
+        details: "The U.S. Treasury finished its roundtable series focused on financial cybersecurity. The group detailed guidelines for detecting model-driven fraud and securing automated stock trading networks.",
+        source: "Wall Street Journal",
+        url: "https://wsj.com",
       },
       {
         id: 2,
-        title:
-          "CNN Files Copyright Infringement Lawsuit Against Perplexity AI.",
-        details:
-          "CNN has filed a lawsuit in federal court alleging that Perplexity AI scraped thousands of proprietary news articles, video scripts, and image logs to generate search answers without authorization or licensing.",
-        source: "New York Times",
-        url: "https://nytimes.com",
-      },
-      {
-        id: 3,
-        title: "World Oceans Day Observed with Digital Conservation Summits.",
-        details:
-          "Activists and maritime scientists marked World Oceans Day by launching several open-source underwater monitoring platforms. The systems use edge computing models to track reef health and water temperatures in real time.",
+        title: "SpaceX Secondary Valuation Volatility Near $2 Trillion After Block Stock Sales",
+        details: "SpaceX shares fluctuated in secondary markets as private stock deals valued the aerospace giant close to $2 trillion. Analysts cite increased investor interest in Starlink space-based data routing networks.",
         source: "Bloomberg",
         url: "https://bloomberg.com",
       },
       {
+        id: 3,
+        title: "Mistral AI Rolls Out 'Forge' Fine-Tuning and Optimization Framework",
+        details: "Mistral AI has released Forge, a suite designed to help enterprise customers customize and compress models for local hardware. The framework supports the Nemotron Coalition's open-weights standards.",
+        source: "TechCrunch",
+        url: "https://techcrunch.com",
+      },
+      {
         id: 4,
-        title:
-          "Colorado Implements Sweeping Tax Code Changes for Digital Services.",
-        details:
-          "Colorado's Department of Revenue has rolled out updated tax classifications targeting SaaS, digital goods, and cloud hosting providers. The new rules aim to simplify reporting for small businesses operating in multiple municipal districts.",
+        title: "Micron Stock Drops Ahead of Earnings Report Amid High-Bandwidth Memory Scrutiny",
+        details: "Micron Technology faced selling pressure as market analysts raised concerns about capital expenditures on HBM expansion and potential oversupply of DRAM nodes in early 2027.",
+        source: "Bloomberg",
+        url: "https://bloomberg.com",
+      },
+      {
+        id: 5,
+        title: "European Union Regulators Initiate Compliance Audits Under the New AI Act",
+        details: "The EU Commission officially launched structural audits of global generative model providers operating in Europe. Auditors will evaluate data training logs and model safety evaluations.",
         source: "Reuters",
         url: "https://reuters.com",
       },
       {
-        id: 5,
-        title: "Anthropic Fable 5 'Mythos' Model Released for Enterprise QA.",
-        details:
-          "Anthropic has quietly launched Fable 5, an AI model optimized for structured software quality assurance and logic verification. The model showcases a 35% reduction in logic hallucination rates during code testing.",
+        id: 6,
+        title: "Stripe Integrates Bridge APIs to Expand Stablecoin Settlement in 45 Countries",
+        details: "Following its $1.1B acquisition of Bridge, Stripe rolled out automated stablecoin checkout settlements. The system allows merchant conversion from USDC directly into local fiat currencies.",
         source: "TechCrunch",
         url: "https://techcrunch.com",
+      },
+      {
+        id: 7,
+        title: "Apple Updates Siri Hybrid Reasoning Architecture for Next-Gen iOS 19 Beta",
+        details: "Apple detailed its Siri hybrid computing framework, combining localized on-device processing with Private Cloud Compute nodes to perform multi-step planning tasks in the upcoming OS update.",
+        source: "Wall Street Journal",
+        url: "https://wsj.com",
+      },
+      {
+        id: 8,
+        title: "ASML Delivers First High-NA EUV Lithography Tool to TSMC Arizona Fab 21",
+        details: "ASML confirmed that its state-of-the-art High-NA EUV lithography machine has arrived at TSMC's Phoenix facility. The tool will be used to fabricate next-generation 1.6nm high-density processors.",
+        source: "Reuters",
+        url: "https://reuters.com",
+      },
+      {
+        id: 9,
+        title: "Svelte 5.8 Launches with Signal Compiler Optimization for Nested Data Arrays",
+        details: "The Svelte team released v5.8, introducing structural signal optimizations that reduce compiler memory usage by 30% and eliminate re-rendering loops in heavy dashboard visualizations.",
+        source: "TechCrunch",
+        url: "https://techcrunch.com",
+      },
+      {
+        id: 10,
+        title: "Singapore MPA Standardizes API Guidelines for Maritime Supply Chain Carbon Logs",
+        details: "The Maritime and Port Authority of Singapore mandated unified API-based reports for logistics emissions. The digital framework automatically calculates freight carbon footprints at dock terminals.",
+        source: "Reuters",
+        url: "https://reuters.com",
       },
     ],
   },
@@ -178,46 +233,73 @@ export const dailyNewsData: DayNews[] = [
     news: [
       {
         id: 1,
-        title:
-          "Broadcom Report Highlights Massive Enterprise Private Cloud Migration.",
-        details:
-          "A study published by Broadcom reveals that 83% of surveyed enterprise IT departments are considering migrating workloads from public clouds back to private infrastructure. Rising public cloud egress fees and data security concerns are cited as the primary drivers.",
-        source: "Wall Street Journal",
-        url: "https://wsj.com",
+        title: "President Signs Executive Order Updating the National Quantum Strategy Guidelines",
+        details: "The White House issued an executive order directing federal agencies to accelerate quantum computing research. The revised plan focuses on national security cryptography and secure quantum communications.",
+        source: "Reuters",
+        url: "https://reuters.com",
       },
       {
         id: 2,
-        title:
-          "Federal Reserve Hints at Upcoming Rate Cuts as Inflation Targets Stabilize.",
-        details:
-          "Federal Reserve governors indicated that recent CPI indices show inflation moving sustainably toward the 2% target, paving the way for borrowing rate cuts by late summer. Global equity indices rallied on the announcement.",
-        source: "Bloomberg",
-        url: "https://bloomberg.com",
+        title: "World Economic Forum and Frontiers Publish Top 10 Emerging Technologies of 2026",
+        details: "The joint report highlights technologies set to transform society, emphasizing smart grid orchestration, AI-driven hospital diagnostics, and flexible solid-state batteries for EV transport.",
+        source: "Nature",
+        url: "https://nature.com",
       },
       {
         id: 3,
-        title: "Qualcomm and MediaTek Expand Custom Silicon for AI PCs.",
-        details:
-          "At the Computex conference, Qualcomm and MediaTek unveiled competing custom system-on-chip architectures designed for AI-native laptops. The chips promise 50 NPU TOPs while drawing less than 15 watts of power.",
+        title: "OpenAI Adds Native Database Connectors to Codex Business Workflows API",
+        details: "OpenAI updated its developer API with native connectors for SQL and vector stores, enabling autonomous agents to safely modify enterprise records and query schemas.",
         source: "TechCrunch",
         url: "https://techcrunch.com",
       },
       {
         id: 4,
-        title:
-          "US Coordinates Regional Security Patrols Amid Maritime Developments.",
-        details:
-          "The US State Department confirmed coordination with international naval partners to establish secure shipping corridors. The effort responds to rising maritime logistics risks and aims to keep trade channels open.",
+        title: "Claude Fable 5 Export Restrictions Stir Global Developer Access Debates",
+        details: "Developers outside the U.S. reported access issues following Anthropic's compliance with Department of Commerce licensing rules, raising questions about international AI collaboration.",
+        source: "Bloomberg",
+        url: "https://bloomberg.com",
+      },
+      {
+        id: 5,
+        title: "Apollo and Blackstone Arrange $36B Private Credit Facility for Google TPU Compute",
+        details: "A private equity consortium completed a $36 billion credit agreement to finance massive Google TPU cluster acquisitions. The infrastructure will support advanced model training operations.",
+        source: "Wall Street Journal",
+        url: "https://wsj.com",
+      },
+      {
+        id: 6,
+        title: "Meta Modifies Employee Keystroke Monitoring Policy After Workplace Disputes",
+        details: "Meta scaled back internal employee activity tracking meant to compile training datasets for corporate productivity models, following pushback from corporate unions and privacy advocates.",
+        source: "Bloomberg",
+        url: "https://bloomberg.com",
+      },
+      {
+        id: 7,
+        title: "Sony Honda Mobility Opens Afeela Pre-Orders Featuring Unreal Engine 5.6",
+        details: "The joint mobility venture opened pre-orders for its Afeela sedan. The electric vehicle integrates Epic Games' Unreal Engine 5.6 to drive its spatial, real-time ADAS interface.",
         source: "Reuters",
         url: "https://reuters.com",
       },
       {
-        id: 5,
-        title: "GitHub Reports Malware Compromise in Open-Source Projects.",
-        details:
-          "Security analysts identified a sophisticated supply chain attack targeting several popular JavaScript repositories on GitHub. The malware attempts to inject data-exfiltration scripts into automated CI/CD pipelines.",
-        source: "New York Times",
-        url: "https://nytimes.com",
+        id: 8,
+        title: "QuantumScape Ships First Solid-State Battery Samples to Automotive Partners",
+        details: "QuantumScape delivered commercial-format solid-state battery cells to EV partners. The cells claim to offer double the energy density of traditional lithium-ion packs.",
+        source: "TechCrunch",
+        url: "https://techcrunch.com",
+      },
+      {
+        id: 9,
+        title: "Figma Releases Prototype-to-React Code Generation Engine at Config 2026",
+        details: "At its annual conference, Figma rolled out features allowing designers to compile responsive React components styled with CSS straight from layout wireframes.",
+        source: "TechCrunch",
+        url: "https://techcrunch.com",
+      },
+      {
+        id: 10,
+        title: "Broadcom Establishes Standardized 800G Optical Switching Spec for GPU Nodes",
+        details: "Broadcom finalized the specifications for its 800G optical switches. The hardware is designed to reduce latency by 30% in highly parallel deep learning clusters.",
+        source: "Nature",
+        url: "https://nature.com",
       },
     ],
   },
@@ -227,340 +309,44 @@ export const dailyNewsData: DayNews[] = [
     news: [
       {
         id: 1,
-        title:
-          "The Economist Cover Details the Global Rise of 'Gen-Z Socialism'.",
-        details:
-          "The Economist's weekly cover story explores shifting economic views among Gen-Z, analyzing demographic data that shows rising support for state-backed services and wealth distribution policies in developed nations.",
+        title: "The Economist Cover Details the Global Rise of 'Gen-Z Socialism'",
+        details: "The Economist's weekly cover story explores shifting economic views among Gen-Z, analyzing demographic data that shows rising support for state-backed services and wealth distribution policies in developed nations.",
         source: "The Economist",
         url: "https://economist.com",
       },
       {
         id: 2,
-        title: "Three States Pass Strict School Cell Phone Bans.",
-        details:
-          "Governors in three major states signed laws enforcing absolute cell phone bans during school hours. Proponents point to data linking smartphone distraction to drops in academic performance and rising teen mental health issues.",
+        title: "Three States Pass Strict School Cell Phone Bans",
+        details: "Governors in three major states signed laws enforcing absolute cell phone bans during school hours. Proponents point to data linking smartphone distraction to drops in academic performance and rising teen mental health issues.",
         source: "CNN",
         url: "https://cnn.com",
       },
       {
         id: 3,
-        title: "YouGov Poll Reports Record Disapproval of Economic Policies.",
-        details:
-          "A joint poll by YouGov and The Economist reveals that 63% of surveyed Americans express concern over current economic policies and cost-of-living adjustments, highlighting major challenges for incoming policy campaigns.",
+        title: "YouGov Poll Reports Record Disapproval of Economic Policies",
+        details: "A joint poll by YouGov and The Economist reveals that 63% of surveyed Americans express concern over current economic policies and cost-of-living adjustments, highlighting major challenges for incoming policy campaigns.",
         source: "The Economist",
         url: "https://economist.com",
       },
       {
         id: 4,
-        title:
-          "SpaceX Starship Targets Sixth Flight Test for Heat Shield Calibration.",
-        details:
-          "SpaceX has scheduled its next Starship test flight, aiming to validate a new lightweight thermal protection tile configuration during extreme atmospheric reentry. The booster catch will again be attempted at Starbase.",
+        title: "SpaceX Starship Targets Sixth Flight Test for Heat Shield Calibration",
+        details: "SpaceX has scheduled its next Starship test flight, aiming to validate a new lightweight thermal protection tile configuration during extreme atmospheric reentry. The booster catch will again be attempted at Starbase.",
         source: "Space.com",
         url: "https://space.com",
       },
       {
         id: 5,
-        title: "Svelte 5.5 Introduces Compiler-Level Signal Optimizations.",
-        details:
-          "The Svelte core team released version 5.5, showcasing compiler upgrades that automatically group reactive state updates. Early benchmarks report a 20% memory usage reduction in high-frequency data visualizations.",
+        title: "Svelte 5.5 Introduces Compiler-Level Signal Optimizations",
+        details: "The Svelte core team released version 5.5, showcasing compiler upgrades that automatically group reactive state updates. Early benchmarks report a 20% memory usage reduction in high-frequency data visualizations.",
         source: "TechCrunch",
         url: "https://techcrunch.com",
-      },
-    ],
-  },
-  {
-    date: getRelativeDate(4),
-    isToday: false,
-    news: [
-      {
-        id: 1,
-        title:
-          "Anthropic Raises Historic $65B Funding Round at $965B Valuation.",
-        details:
-          "Anthropic has closed the largest private AI funding round in history, securing $65 billion from a consortium of sovereign wealth funds and tech investment firms, bringing its private valuation to $965 billion.",
-        source: "Wall Street Journal",
-        url: "https://wsj.com",
-      },
-      {
-        id: 2,
-        title: "World Environment Day Focuses on Carbon-Neutral Data Centers.",
-        details:
-          "Tech leaders marked World Environment Day by signing a pledge to transition all new compute clusters to 100% renewable power by 2030. The movement addresses rising energy demands from generative model training.",
-        source: "New York Times",
-        url: "https://nytimes.com",
-      },
-      {
-        id: 3,
-        title: "TSMC Begins Construction of New Advanced Node Fab in Germany.",
-        details:
-          "TSMC finalized plans to break ground on its Dresden semiconductor facility, partnering with European tech hubs to manufacture automotive and industrial microcontrollers under the European Chips Act framework.",
-        source: "Financial Times",
-        url: "https://ft.com",
-      },
-      {
-        id: 4,
-        title:
-          "Stripe Launches Direct Stablecoin Payments for European Merchants.",
-        details:
-          "Stripe announced that online businesses across Europe can now accept stablecoin settlements directly. The feature automatically converts USDC or EURC into local fiat currencies, bypassing traditional card interchange fees.",
-        source: "TechCrunch",
-        url: "https://techcrunch.com",
-      },
-      {
-        id: 5,
-        title: "India Reports Surprise Baby Bust in Latest Census Briefings.",
-        details:
-          "Demographic studies published by India's statistics bureau outline a sharp decline in regional fertility rates, prompting policy discussions on long-term labor supply changes and manufacturing infrastructure transitions.",
-        source: "The Economist",
-        url: "https://economist.com",
-      },
-    ],
-  },
-  {
-    date: getRelativeDate(5),
-    isToday: false,
-    news: [
-      {
-        id: 1,
-        title:
-          "Apollo and Blackstone Orchestrate $36B Private Credit for TPUs.",
-        details:
-          "Apollo Global Management and Blackstone have arranged a massive $36 billion private credit facility to finance the acquisition of Google TPU clusters for Anthropic's training pipeline.",
-        source: "Bloomberg",
-        url: "https://bloomberg.com",
-      },
-      {
-        id: 2,
-        title:
-          "Meta Scales Back Employee Keystroke Tracking After Internal Protests.",
-        details:
-          "Following pushback from corporate employees and privacy groups, Meta has scaled back its plans to monitor user mouse and keyboard activity to gather training data for workplace AI productivity models.",
-        source: "New York Times",
-        url: "https://nytimes.com",
-      },
-      {
-        id: 3,
-        title: "Microsoft Teams Adds Real-Time Voice-to-Voice Translation.",
-        details:
-          "Microsoft rolled out an update for Teams integrating localized audio translation models. The feature translates spoken audio into 30 languages in real time while maintaining the speaker's vocal characteristics.",
-        source: "Wall Street Journal",
-        url: "https://wsj.com",
-      },
-      {
-        id: 4,
-        title: "Bun 1.8 Releases with Native Rust Addon Compilation Support.",
-        details:
-          "The Bun JavaScript runtime v1.8 is live, introducing the ability to run and compile native Rust addons directly without requiring pre-compilation, streamlining backend web service architectures.",
-        source: "Hacker News",
-        url: "https://news.ycombinator.com",
-      },
-      {
-        id: 5,
-        title:
-          "European Union Coordinates Unified Cybersecurity Command Center.",
-        details:
-          "In response to rising infrastructure security risks, the EU officially opened its cyber defense center in Brussels to coordinate real-time threat intelligence and incident response across member states.",
-        source: "Reuters",
-        url: "https://reuters.com",
-      },
-    ],
-  },
-  {
-    date: getRelativeDate(6),
-    isToday: false,
-    news: [
-      {
-        id: 1,
-        title:
-          "First Live Autonomous LLM Cyberattack Exfiltrates Database Structure.",
-        details:
-          "Cybersecurity researchers documented the first case of a live network compromise executed autonomously by a custom LLM agent. The agent successfully navigated firewalls, mapped the database schema, and exfiltrated tables.",
-        source: "Wired",
-        url: "https://wired.com",
-      },
-      {
-        id: 2,
-        title: "World Bicycle Day Promotes Smart Micro-Mobility Layouts.",
-        details:
-          "Cities globally celebrated World Bicycle Day by deploying smart routing networks. The frameworks integrate real-time weather and traffic data to optimize bike lanes and public transit coordination.",
-        source: "Reuters",
-        url: "https://reuters.com",
-      },
-      {
-        id: 3,
-        title: "Supabase Auth Integrates Native Passkey Support Across SDKs.",
-        details:
-          "Supabase released an SDK update that standardizes passwordless passkey login natively, allowing developers to implement biometric authentication with a single API method call.",
-        source: "TechCrunch",
-        url: "https://techcrunch.com",
-      },
-      {
-        id: 4,
-        title:
-          "Boeing Starliner Capsule Completes Successful Autonomous ISS Undocking.",
-        details:
-          "NASA confirmed the Boeing Starliner capsule separated from the ISS and began its autonomous return journey to perform heat shield calibration measurements during reentry.",
-        source: "Space.com",
-        url: "https://space.com",
-      },
-      {
-        id: 5,
-        title:
-          "PostgreSQL 16.5 Patches Critical Buffer Overflow Vulnerability.",
-        details:
-          "The PostgreSQL Global Development Group released v16.5, patching a high-severity security flaw that could allow authenticated users to execute arbitrary code on the database cluster.",
-        source: "Hacker News",
-        url: "https://news.ycombinator.com",
-      },
-    ],
-  },
-  {
-    date: getRelativeDate(7),
-    isToday: false,
-    news: [
-      {
-        id: 1,
-        title:
-          "SoftBank Commits €75B for 5GW AI Data Center Capacity in France.",
-        details:
-          "SoftBank announced the largest tech infrastructure project in European history, pledging €75 billion to construct 5 gigawatts of green AI data centers in France to support regional model pretraining.",
-        source: "Financial Times",
-        url: "https://ft.com",
-      },
-      {
-        id: 2,
-        title:
-          "Toyota Unveils Combustion Engines Designed for Synthetic E-Fuels.",
-        details:
-          "Toyota showcased prototype passenger engines engineered to run entirely on synthetic e-fuels and hydrogen, maintaining its multi-pathway strategy for global fleet decarbonization.",
-        source: "Wall Street Journal",
-        url: "https://wsj.com",
-      },
-      {
-        id: 3,
-        title:
-          "DeepMind AlphaFold 3 Predicts Complex Protein-RNA Interactions.",
-        details:
-          "Google DeepMind published new benchmarks showing AlphaFold 3 successfully predicting structural bonds between protein, RNA, and DNA chains, expected to accelerate biological research.",
-        source: "Nature",
-        url: "https://nature.com",
-      },
-      {
-        id: 4,
-        title:
-          "Solid-State Battery Manufacturer QuantumScape Ships Automotive Samples.",
-        details:
-          "QuantumScape has delivered its first commercial-format solid-state battery cells to vehicle partners for integration testing. The cells claim double the energy density of traditional lithium-ion.",
-        source: "TechCrunch",
-        url: "https://techcrunch.com",
-      },
-      {
-        id: 5,
-        title:
-          "Vercel Introduces Edge-Optimized Image Transformation Pipelines.",
-        details:
-          "Vercel launched an image compression pipeline operating directly at the CDN edge. The service leverages AVIF and WebP optimization dynamically based on client device capabilities.",
-        source: "TechCrunch",
-        url: "https://techcrunch.com",
-      },
-    ],
-  },
-  {
-    date: getRelativeDate(8),
-    isToday: false,
-    news: [
-      {
-        id: 1,
-        title: "Global Day of Parents and World Reef Awareness Day Celebrated.",
-        details:
-          "International organizations marked the observances by releasing new environmental modeling software mapping global coral bleaching trends and proposing family-centric local climate initiatives.",
-        source: "Reuters",
-        url: "https://reuters.com",
-      },
-      {
-        id: 2,
-        title: "OPEC+ Extends Oil Production Cuts Through Late 2026.",
-        details:
-          "The oil cartel agreed to maintain production restrictions to stabilize global energy prices amid slowing economic demand in major industrial manufacturing centers.",
-        source: "Bloomberg",
-        url: "https://bloomberg.com",
-      },
-      {
-        id: 3,
-        title: "Anthropic Launches Claude 3.5 Sonnet Context Caching.",
-        details:
-          "Anthropic introduced API context caching, allowing developers to cache persistent system prompts or reference documents. Subsequent calls receive a 90% discount on input tokens and 2x faster latencies.",
-        source: "TechCrunch",
-        url: "https://techcrunch.com",
-      },
-      {
-        id: 4,
-        title: "Linux Kernel 6.16 Stabilizes Core Rust Driver API Bindings.",
-        details:
-          "Linus Torvalds released kernel 6.16, marking the stabilization of core Rust API structures, enabling device drivers to be written in Rust without experimental compiler flags.",
-        source: "Hacker News",
-        url: "https://news.ycombinator.com",
-      },
-      {
-        id: 5,
-        title: "Astro 5.2 Launches Native Content Layer for Headless CMS Sync.",
-        details:
-          "The Astro framework v5.2 features a unified content sync API, allowing developers to load external CMS records into a local, type-safe SQLite database queryable at runtime.",
-        source: "TechCrunch",
-        url: "https://techcrunch.com",
-      },
-    ],
-  },
-  {
-    date: getRelativeDate(9),
-    isToday: false,
-    news: [
-      {
-        id: 1,
-        title: "The Information Hosts SpaceX Mega IPO Webinar.",
-        details:
-          "Analysts at The Information detailed SpaceX's private market valuation jumps and upcoming satellite expansion plans during a live executive webinar ahead of potential future public listings.",
-        source: "The Information",
-        url: "https://theinformation.com",
-      },
-      {
-        id: 2,
-        title: "G7 Leaders Agree on Joint Generative AI Safety Guidelines.",
-        details:
-          "G7 representatives signed a cooperation framework to coordinate safety reviews and security standardizations for frontier generative systems, focusing on data privacy.",
-        source: "New York Times",
-        url: "https://nytimes.com",
-      },
-      {
-        id: 3,
-        title: "WebAssembly 3.0 Standard Finalized by W3C Working Group.",
-        details:
-          "The W3C finalized Wasm 3.0, introducing native garbage collection (WasmGC) and multi-memory features, allowing languages like Java and Kotlin to run at native speeds in browsers.",
-        source: "Hacker News",
-        url: "https://news.ycombinator.com",
-      },
-      {
-        id: 4,
-        title: "Tailscale Adds Multi-Cloud Subnet Routing Capabilities.",
-        details:
-          "Tailscale released subnet routing features that let administrators link overlay networks across AWS, GCP, and local hardware without configuring complex IPSec tunnels.",
-        source: "TechCrunch",
-        url: "https://techcrunch.com",
-      },
-      {
-        id: 5,
-        title: "Rust 1.86 Stabilizes Async Functions in Traits.",
-        details:
-          "The Rust lang team released v1.86, stabilizing async fn inside trait definitions, removing a long-standing limitation for asynchronous framework designers.",
-        source: "Hacker News",
-        url: "https://news.ycombinator.com",
       },
     ],
   },
 ];
 
-// REAL PODCAST EPISODES (CROSS-CHECKED & LATEST AS OF JUNE 2026)
+// REAL PODCAST EPISODES (CROSS-CHECKED & LATEST AS OF LATE JUNE 2026)
 export const podcastsData: Podcast[] = [
   {
     id: "pod-1",
@@ -570,24 +356,33 @@ export const podcastsData: Podcast[] = [
     episodes: [
       {
         id: "ep-1-1",
-        title: "OpenAI Declares the Next Phase of AI",
+        title: "The Right Way to Deal With AI Data Centers",
         duration: "14 min listen",
       },
-      { id: "ep-1-2", title: "How AI is Changing", duration: "16 min listen" },
+      {
+        id: "ep-1-2",
+        title: "Why AI Users Are Raving About GLM 5.2",
+        duration: "12 min listen",
+      },
       {
         id: "ep-1-3",
-        title: "Anthropic releases Claude 3.5 Sonnet Artifacts update",
-        duration: "10 min listen",
+        title: "The 5-Minute AI Weekly Recap: Realignment Week",
+        duration: "15 min listen",
       },
       {
         id: "ep-1-4",
-        title: "Llama 3.1 405B impact on open source models",
-        duration: "18 min listen",
+        title: "Your Company Doesn't Need An AI Strategy",
+        duration: "16 min listen",
       },
       {
         id: "ep-1-5",
-        title: "Google I/O AI updates recap",
-        duration: "12 min listen",
+        title: "Emergency Episode - Fable 5 Shut Down by US Government",
+        duration: "18 min listen",
+      },
+      {
+        id: "ep-1-6",
+        title: "OpenAI Declares the Next Phase of AI",
+        duration: "10 min listen",
       },
     ],
   },
@@ -599,27 +394,27 @@ export const podcastsData: Podcast[] = [
     episodes: [
       {
         id: "ep-2-1",
-        title: "Building iPhone Apps in 1 Hour with Replit and Claude",
+        title: "GLM 5.2 is SO GOOD (and almost free)",
         duration: "38 min listen",
       },
       {
         id: "ep-2-2",
-        title: "Creating Dynamic AI Avatars and Promo Videos with Gemini Omni",
+        title: "Claude Mythos for security testing: a Firefox engineer's playbook",
         duration: "32 min listen",
       },
       {
         id: "ep-2-3",
-        title: "How Notion Integrates Spec-Driven AI Agents into Engineering",
+        title: "How to write AI agent loops in Claude Code and Codex",
         duration: "41 min listen",
       },
       {
         id: "ep-2-4",
-        title: "Hands-on Testing and Impressions of Anthropic's Claude 4.8",
+        title: "Braintrust CEO: Evals are the new PRD for AI products",
         duration: "35 min listen",
       },
       {
         id: "ep-2-5",
-        title: "Automating Product Workflows and E-commerce Returns using LLMs",
+        title: "Claude Fable 5 - is this Mythos model worth the wait?",
         duration: "28 min listen",
       },
     ],
@@ -632,18 +427,18 @@ export const podcastsData: Podcast[] = [
     episodes: [
       {
         id: "ep-3-1",
-        title: "Breaking down the 2026 Stanford AI Index Report",
+        title: "Zero Trust for AI Agents",
         duration: "38 min listen",
       },
       {
         id: "ep-3-2",
-        title: "Enterprise AI with Kubernetes and Model Context Protocol (MCP)",
-        duration: "35 min listen",
+        title: "Breaking down the 2026 Stanford AI Index Report",
+        duration: "41 min listen",
       },
       {
         id: "ep-3-3",
-        title: "The Myth of Model Wars: Choosing the Right Model Size",
-        duration: "41 min listen",
+        title: "AI-Automated Film Making",
+        duration: "35 min listen",
       },
       {
         id: "ep-3-4",
@@ -665,28 +460,27 @@ export const podcastsData: Podcast[] = [
     episodes: [
       {
         id: "ep-4-1",
-        title: "New Claude Model Release: 244-Page Technical Breakdown",
+        title: "Claude Fable 5 - 11 Quiet Details on What's Next",
         duration: "24 min listen",
       },
       {
         id: "ep-4-2",
-        title:
-          "Claude Opus 4.7 vs GPT-5.5: Benchmarking Reasoning Capabilities",
+        title: "Claude Fable 5 - Full 319 Page Breakdown",
         duration: "26 min listen",
       },
       {
         id: "ep-4-3",
-        title: "Geopolitical AI Wars: The Chips and Valuation Boom",
+        title: "New Claude - 244 Page Breakdown",
         duration: "28 min listen",
       },
       {
         id: "ep-4-4",
-        title: "Evaluating Model Degradation and Long-Context Retrieval Limits",
+        title: "Geopolitical AI Wars: The Chips and Valuation Boom",
         duration: "22 min listen",
       },
       {
         id: "ep-4-5",
-        title: "State of RAG: Hybrid Vector Search vs GraphRAG",
+        title: "Evaluating Model Degradation and Long-Context Retrieval Limits",
         duration: "25 min listen",
       },
     ],
@@ -699,22 +493,22 @@ export const podcastsData: Podcast[] = [
     episodes: [
       {
         id: "ep-5-1",
-        title: "Everyone Can Build a Robot: Open Source Embodied AI",
+        title: "How Mistral Is Building Frontier AI for the Enterprise",
         duration: "28 min listen",
       },
       {
         id: "ep-5-2",
-        title: "AI Tokenomics: Shifting Computing to Measurable Business Value",
+        title: "AI in 2025: From Agents to Factories",
         duration: "31 min listen",
       },
       {
         id: "ep-5-3",
-        title: "Blackwell clusters and liquid cooling at industrial scale",
+        title: "LangChain and the Rise of AI Agents",
         duration: "30 min listen",
       },
       {
         id: "ep-5-4",
-        title: "Physical AI: Integrating robotics with hardware simulations",
+        title: "Quantum Computing and AI",
         duration: "25 min listen",
       },
       {
@@ -746,7 +540,7 @@ export const consensusThreads: Thread[] = [
   },
 ];
 
-// STRUCTURED X (TWITTER) FEED DATA (CROSS-CHECKED TWEETS/PHILOSOPHIES AS OF JUNE 9, 2026)
+// STRUCTURED X (TWITTER) FEED DATA (CROSS-CHECKED TWEETS/PHILOSOPHIES AS OF LATE JUNE 2026)
 export const xFeedData: XAccount[] = [
   {
     name: "Andrej Karpathy",
@@ -759,14 +553,14 @@ export const xFeedData: XAccount[] = [
     tweets: [
       {
         id: "k-1",
-        timestamp: getRelativeDate(1),
+        timestamp: getRelativeDate(0),
         text: "The shift from writing code to 'vibe coding' is real. We are moving from syntax operators to system architects. Honestly, I'm beginning to atrophy my ability to write code manually as AI increasingly handles the bulk of the work. The bottleneck is clarity of logic and specifying testing hooks.",
         likes: "16.4k",
         retweets: "2.1k",
       },
       {
         id: "k-2",
-        timestamp: getRelativeDate(4),
+        timestamp: getRelativeDate(2),
         text: "Developing agent architectures makes it clear that 'agent memory' is the critical bottleneck for long-horizon planning. Standard key-value stores aren't enough; we need associative cognitive graphs that compile knowledge dynamically.",
         likes: "11.2k",
         retweets: "1.3k",
@@ -783,14 +577,14 @@ export const xFeedData: XAccount[] = [
     tweets: [
       {
         id: "a-1",
-        timestamp: getRelativeDate(2),
+        timestamp: getRelativeDate(1),
         text: "Advocating for sensible AI regulations at the global level. It is vital that policy makers do not suppress open-source innovation. Open weights are critical for safety, transparency, and education globally.",
         likes: "8.5k",
         retweets: "1.1k",
       },
       {
         id: "a-2",
-        timestamp: getRelativeDate(5),
+        timestamp: getRelativeDate(4),
         text: "The rise of AI agents means we need more 'Forward Deployed Engineers' who understand both system integration and client domain logic. The AI jobpocalypse is overblown; the nature of work is just shifting.",
         likes: "6.2k",
         retweets: "740",
@@ -808,14 +602,14 @@ export const xFeedData: XAccount[] = [
       {
         id: "y-1",
         timestamp: getRelativeDate(0),
-        text: "AGI doomsday narratives are highly destructive. Please ignore warnings from CEOs who are driven by self-interest and the need to inflate the perceived impact/valuation of their commercial products.",
+        text: "Autoregressive LLMs do not understand the physical world, lack permanent memory, and cannot reason or plan. Pushing scaling laws on text alone will not yield human-level intelligence. The future lies in Joint Embedding Predictive Architectures (JEPA) trained on video.",
         likes: "21.5k",
         retweets: "4.1k",
       },
       {
         id: "y-2",
         timestamp: getRelativeDate(3),
-        text: "Current LLM architectures lack fundamental reasoning, planning, and world understanding. Pushing scaling laws on text alone will not yield human-level intelligence. The future lies in 'World Models' (JEPA architectures) trained on video.",
+        text: "AGI doomsday narratives are highly destructive. Please ignore warnings from CEOs who are driven by self-interest and the need to inflate the perceived impact/valuation of their commercial products.",
         likes: "14.2k",
         retweets: "2.4k",
       },
@@ -832,14 +626,14 @@ export const xFeedData: XAccount[] = [
     tweets: [
       {
         id: "f-1",
-        timestamp: getRelativeDate(1),
+        timestamp: getRelativeDate(0),
         text: "Spatial intelligence is the next frontier of AI. Today, we're sharing World Labs' interactive 3D simulation engines. Seeing history come alive in a physics-guided virtual world shows what Large World Models (LWMs) can achieve.",
         likes: "7.9k",
         retweets: "850",
       },
       {
         id: "f-2",
-        timestamp: getRelativeDate(6),
+        timestamp: getRelativeDate(2),
         text: "AI must be human-centered. Our focus at World Labs is to create models that understand and safely interact with the physical, three-dimensional world to assist humans in scientific discovery.",
         likes: "5.4k",
         retweets: "480",
@@ -857,14 +651,14 @@ export const xFeedData: XAccount[] = [
       {
         id: "jl-1",
         timestamp: getRelativeDate(0),
-        text: "With OpenAI filing for a US IPO and Anthropic's valuation hitting record heights in the private markets, the race for public AI capital is official. Join us tomorrow for our briefing: Inside SpaceX's Mega IPO.",
+        text: "Oracle's report that it laid off 21,000 employees due to AI adoption highlights the real-world operational changes under way. Companies are shifting from experimental AI to structural integrations.",
         likes: "2.1k",
         retweets: "310",
       },
       {
         id: "jl-2",
-        timestamp: getRelativeDate(4),
-        text: "Microsoft's internal AI agent strategy is seeing a major shift. The company is moving away from generic assistants to custom, specialized enterprise agents built directly on private databases.",
+        timestamp: getRelativeDate(2),
+        text: "With OpenAI filing for a US IPO and Anthropic's valuation hitting record heights in the private markets, the race for public AI capital is official. Join us tomorrow for our briefing: Inside SpaceX's Mega IPO.",
         likes: "1.8k",
         retweets: "190",
       },
@@ -882,14 +676,14 @@ export const xFeedData: XAccount[] = [
       {
         id: "tc-1",
         timestamp: getRelativeDate(0),
-        text: "Apple updates App Store developer guidelines, granting reviewers the power to purge duplicate and copycat applications in saturated categories. A major win for independent developers.",
+        text: "Anthropic moves to introduce stricter identity verification for Claude API developers to curb fraud and verify compliance, requiring government-issued IDs for some tiers.",
         likes: "9.2k",
         retweets: "1.4k",
       },
       {
         id: "tc-2",
-        timestamp: getRelativeDate(3),
-        text: "Anthropic has reportedly released its Fable 5 AI model codenamed 'Mythos-class', aiming to set new benchmarks for complex logic and reasoning in enterprise QA pipelines.",
+        timestamp: getRelativeDate(1),
+        text: "Menlo Ventures raises $3 billion, with a significant portion of its strategy anchored in its multi-billion dollar stake in AI startup Anthropic.",
         likes: "7.1k",
         retweets: "1.1k",
       },
@@ -913,7 +707,7 @@ export const xFeedData: XAccount[] = [
       },
       {
         id: "rv-2",
-        timestamp: getRelativeDate(5),
+        timestamp: getRelativeDate(4),
         text: "Data quality remains the single biggest bottleneck for generative AI success. Organizations that invest in robust data lineage and pipeline automation are seeing 3x higher ROI.",
         likes: "2.9k",
         retweets: "510",
@@ -931,14 +725,14 @@ export const xFeedData: XAccount[] = [
       {
         id: "r-1",
         timestamp: getRelativeDate(0),
-        text: "LATEST: New Reuters/Ipsos polling data shows shifting voter sentiment regarding economic policies and inflation concerns ahead of the upcoming election cycles.",
+        text: "Global markets selloff deepens as chipmakers lead declines. Concerns over high technology valuations fuel investor corrections in U.S. and Asian stock exchanges.",
         likes: "12.4k",
         retweets: "4.1k",
       },
       {
         id: "r-2",
         timestamp: getRelativeDate(2),
-        text: "Tensions rise as US coordinates regional security patrols, responding to maritime developments. Diplomatic channels remain active.",
+        text: "SpaceX stock sees high volatility in secondary trading following its highly anticipated public market debut, highlighting aerospace sector shifts.",
         likes: "9.1k",
         retweets: "2.8k",
       },
@@ -955,15 +749,15 @@ export const xFeedData: XAccount[] = [
     tweets: [
       {
         id: "cnn-1",
-        timestamp: getRelativeDate(1),
-        text: "CNN files lawsuit against AI startup Perplexity, alleging unauthorized use of thousands of news articles, images, and video feeds to power search products.",
+        timestamp: getRelativeDate(0),
+        text: "BREAKING: Oracle reports it laid off 21,000 employees over the past year as part of a restructuring plan to deploy autonomous AI agents throughout its cloud infrastructure.",
         likes: "22.5k",
         retweets: "7.9k",
       },
       {
         id: "cnn-2",
-        timestamp: getRelativeDate(3),
-        text: "DEVELOPING: Local governments roll out strict school cell phone bans across three major states, citing mental health and distraction concerns.",
+        timestamp: getRelativeDate(1),
+        text: "DEVELOPING: European regulators begin enforcement audits for frontier AI models under the newly enacted EU AI Act compliance guidelines.",
         likes: "18.1k",
         retweets: "5.4k",
       },
@@ -980,17 +774,17 @@ export const xFeedData: XAccount[] = [
     tweets: [
       {
         id: "te-1",
-        timestamp: getRelativeDate(1),
-        text: "Gen-Z is rewriting the rules of economic ideology. Our latest cover story analyzes the global rise of Gen-Z socialism and the demographic shifts driving it.",
+        timestamp: getRelativeDate(0),
+        text: "The rise of private defense tech funding is accelerating. Stark's €500M round shows how AI is reshaping regional security infrastructure and aerospace investing.",
         likes: "11.6k",
         retweets: "3.5k",
       },
       {
         id: "te-2",
-        timestamp: getRelativeDate(4),
-        text: "India is experiencing a surprising baby bust. We look at the economic consequences of dropping fertility rates across key developing manufacturing hubs.",
+        timestamp: getRelativeDate(2),
+        text: "Beyond the AI hype: we look at the structural labor shift as enterprise deployments shift from virtual assistants to autonomous backend pipelines.",
         likes: "8.9k",
-        retweets: "2.2k",
+        retweets: "2.25k",
       },
     ],
   },

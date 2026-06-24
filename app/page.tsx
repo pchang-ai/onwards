@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import HeroMetrics from "@/components/HeroMetrics";
 
@@ -320,6 +320,11 @@ export default function Home() {
 
   const [podcastPlayProgress, setPodcastPlayProgress] = useState<number>(0);
 
+  const [volume, setVolume] = useState<number>(0.7);
+  const [isMuted, setIsMuted] = useState<boolean>(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const skipNextRef = useRef<() => void>(() => {});
+
   const [selectedVoiceCategories, setSelectedVoiceCategories] = useState<
     string[]
   >(["AI Pioneers", "Tech and Business Journalists", "News Aggregators"]);
@@ -374,43 +379,77 @@ export default function Home() {
     }
   };
 
-  // Simulated Podcast Progress Effect (supporting single play or sequential playlist)
-
+  // Keep skipNextRef updated with latest skipQueueNext function reference
   useEffect(() => {
-    let interval: any;
+    skipNextRef.current = skipQueueNext;
+  });
 
-    if (playingPodcastId || isQueuePlaying) {
-      interval = setInterval(() => {
-        setPodcastPlayProgress((prev) => {
-          if (prev >= 100) {
-            if (isQueuePlaying) {
-              if (currentQueueIndex < playlistQueue.length - 1) {
-                setCurrentQueueIndex((idx) => idx + 1);
+  // Maps episode IDs to real, fast-loading, public test MP3 files
+  const getAudioTrackUrl = (episodeId: string): string => {
+    if (episodeId.includes("-1")) return "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
+    if (episodeId.includes("-2")) return "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3";
+    if (episodeId.includes("-3")) return "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3";
+    if (episodeId.includes("-4")) return "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3";
+    if (episodeId.includes("-5")) return "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3";
+    return "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
+  };
 
-                return 0;
-              } else {
-                setIsQueuePlaying(false);
+  // Effect 1: Initialize HTML5 Audio and attach time/ended listeners
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const audio = new Audio();
+      audioRef.current = audio;
 
-                setCurrentQueueIndex(-1);
+      const handleTimeUpdate = () => {
+        if (audio.duration) {
+          setPodcastPlayProgress((audio.currentTime / audio.duration) * 100);
+        }
+      };
 
-                return 0;
-              }
-            } else {
-              setPlayingPodcastId(null);
+      const handleEnded = () => {
+        skipNextRef.current();
+      };
 
-              return 0;
-            }
-          }
+      audio.addEventListener("timeupdate", handleTimeUpdate);
+      audio.addEventListener("ended", handleEnded);
 
-          return prev + 4; // increment faster for playlist feedback
-        });
-      }, 200);
-    } else {
-      setPodcastPlayProgress(0);
+      return () => {
+        audio.pause();
+        audio.removeEventListener("timeupdate", handleTimeUpdate);
+        audio.removeEventListener("ended", handleEnded);
+        audioRef.current = null;
+      };
     }
+  }, []);
 
-    return () => clearInterval(interval);
-  }, [playingPodcastId, isQueuePlaying, currentQueueIndex, playlistQueue]);
+  // Effect 2: Synchronize Source Changes and Play/Pause Actions
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (isQueuePlaying && currentQueueIndex >= 0 && currentQueueIndex < playlistQueue.length) {
+      const activeTrack = playlistQueue[currentQueueIndex];
+      const targetSrc = getAudioTrackUrl(activeTrack.id);
+
+      if (audio.src !== targetSrc) {
+        audio.src = targetSrc;
+        audio.load();
+      }
+
+      audio.play().catch((err) => {
+        console.warn("Audio playback was blocked or interrupted:", err);
+      });
+    } else {
+      audio.pause();
+    }
+  }, [isQueuePlaying, currentQueueIndex, playlistQueue]);
+
+  // Effect 3: Synchronize Volume and Mute States
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = isMuted ? 0 : volume;
+    }
+  }, [volume, isMuted]);
 
   // The Playground States
 
@@ -4082,7 +4121,7 @@ export default function Home() {
                       </h3>
 
                       <p className="text-sm text-slate-400 font-light mt-1">
-                        Top 5 daily briefings to keep you updated and educated.
+                        Top 10 daily briefings to keep you updated and educated.
                       </p>
                     </div>
 
@@ -4318,9 +4357,7 @@ export default function Home() {
                           </div>
                         ) : (
                           <div className="flex flex-col gap-4">
-                            {/* Playlist Queue controls */}
-
-                            <div className="p-4 bg-black/30 rounded-xl flex flex-col gap-3">
+                               <div className="p-4 bg-black/30 rounded-xl flex flex-col gap-3">
                               {isQueuePlaying &&
                                 currentQueueIndex >= 0 &&
                                 currentQueueIndex < playlistQueue.length && (
@@ -4361,12 +4398,20 @@ export default function Home() {
                                           .duration
                                       }
                                     </p>
+
+                                    {/* Play Progress Bar */}
+                                    <div className="w-full bg-slate-950 rounded-full h-1.5 mt-1 overflow-hidden">
+                                      <div
+                                        className="bg-emerald-500 h-full rounded-full transition-all duration-100"
+                                        style={{ width: `${podcastPlayProgress}%` }}
+                                      />
+                                    </div>
                                   </div>
                                 )}
 
-                              {/* Control Buttons */}
+                              {/* Control Buttons & Volume */}
 
-                              <div className="flex items-center justify-between border-t border-slate-900/60 pt-3 mt-1">
+                              <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-900/60 pt-3 mt-1">
                                 <div className="flex items-center gap-3">
                                   <button
                                     onClick={toggleQueuePlay}
@@ -4381,6 +4426,30 @@ export default function Home() {
                                   >
                                     Skip Next &raquo;
                                   </button>
+                                </div>
+
+                                {/* Volume slider and Mute button */}
+                                <div className="flex items-center gap-2 bg-[#0e2018]/60 px-3 py-1 rounded-xl">
+                                  <button
+                                    onClick={() => setIsMuted((m) => !m)}
+                                    className="text-slate-400 hover:text-white text-base focus:outline-none"
+                                    title={isMuted ? "Unmute" : "Mute"}
+                                  >
+                                    {isMuted || volume === 0 ? "🔇" : volume < 0.4 ? "🔈" : volume < 0.7 ? "🔉" : "🔊"}
+                                  </button>
+                                  <input
+                                    type="range"
+                                    min="0"
+                                    max="1"
+                                    step="0.05"
+                                    value={isMuted ? 0 : volume}
+                                    onChange={(e) => {
+                                      const val = parseFloat(e.target.value);
+                                      setVolume(val);
+                                      if (val > 0) setIsMuted(false);
+                                    }}
+                                    className="w-16 md:w-20 accent-emerald-500 cursor-pointer h-1 rounded-lg bg-slate-900 appearance-none"
+                                  />
                                 </div>
 
                                 <span className="text-sm text-slate-400">
@@ -4521,7 +4590,7 @@ export default function Home() {
                                   </p>
 
                                   <div className="space-y-2.5">
-                                    {podcast.episodes.slice(0, 3).map((ep) => {
+                                    {podcast.episodes.map((ep) => {
                                       const isQueued = playlistQueue.some(
                                         (q) => q.id === ep.id,
                                       );
@@ -4589,17 +4658,6 @@ export default function Home() {
                                         </div>
                                       );
                                     })}
-                                  </div>
-
-                                  <div className="mt-4 pt-3 border-t border-slate-900/60 text-right">
-                                    <button
-                                      onClick={() =>
-                                        setSelectedModalPodcast(podcast)
-                                      }
-                                      className="text-sm font-bold text-emerald-450 hover:underline"
-                                    >
-                                      View Full Episode List &rarr;
-                                    </button>
                                   </div>
                                 </div>
                               )}
