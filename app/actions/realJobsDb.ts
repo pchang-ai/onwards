@@ -4,7 +4,7 @@ export interface RealJob {
   link: string;
   location: string;
   postDate: string;
-  source: 'LinkedIn' | 'Ladders' | 'Wellfound' | 'Built In' | 'We Work Remotely';
+  source: 'LinkedIn' | 'Ladders' | 'Wellfound' | 'Built In' | 'Remote Only';
 }
 
 export const REAL_JOBS_DB: RealJob[] = [
@@ -671,5 +671,54 @@ export const REAL_JOBS_DB: RealJob[] = [
     "location": "San Mateo, CA",
     "postDate": "6 days ago",
     "source": "Built In"
+  },
+  {
+    "title": "Junior Frontend Developer",
+    "company": "Vercel",
+    "link": "https://vercel.com/careers",
+    "location": "Remote",
+    "postDate": "2 days ago",
+    "source": "Remote Only"
+  },
+  {
+    "title": "Associate AI Engineer",
+    "company": "Hugging Face",
+    "link": "https://huggingface.co/careers",
+    "location": "Remote",
+    "postDate": "1 day ago",
+    "source": "Remote Only"
+  },
+  {
+    "title": "Software Engineer",
+    "company": "Buffer",
+    "link": "https://buffer.com/careers",
+    "location": "Remote",
+    "postDate": "3 days ago",
+    "source": "Remote Only"
+  },
+  {
+    "title": "Senior Frontend Engineer",
+    "company": "GitLab",
+    "link": "https://about.gitlab.com/jobs",
+    "location": "Remote",
+    "postDate": "5 days ago",
+    "source": "Remote Only"
+  },
+  {
+    "title": "Engineering Manager (AI Platforms)",
+    "company": "Zapier",
+    "link": "https://zapier.com/jobs",
+    "location": "Remote",
+    "postDate": "4 days ago",
+    "source": "Remote Only"
+  },
+  {
+    "title": "VP of Engineering",
+    "company": "Replicate",
+    "link": "https://replicate.com/careers",
+    "location": "Remote",
+    "postDate": "1 week ago",
+    "source": "Remote Only"
   }
 ];
+

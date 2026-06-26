@@ -16,7 +16,7 @@ export interface Role {
   link?: string;
   location?: string;
   postDate?: string;
-  source?: 'LinkedIn' | 'Ladders' | 'Wellfound' | 'Built In' | 'We Work Remotely';
+  source?: 'LinkedIn' | 'Ladders' | 'Wellfound' | 'Built In' | 'Remote Only';
   levelLabel?: string;
 }
 

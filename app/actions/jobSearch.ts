@@ -8,50 +8,26 @@ export type CareerLevel = 'Entry' | 'Mid' | 'Senior' | 'Director' | 'VP';
  * Classifies a job posting into a standard career level based on title keywords.
  */
 export function getJobLevel(title: string): CareerLevel {
-  const t = title.toLowerCase();
+  const t = title.toLowerCase().replace(/[^a-zA-Z0-9]/g, ' ');
   
-  if (
-    t.includes("vice president") || 
-    t.includes("vp") || 
-    t.includes("svp") || 
-    t.includes("chief") || 
-    t.includes("cto") || 
-    t.includes("ceo") || 
-    t.includes("executive") || 
-    t.includes("c-level") ||
-    t.includes("c-suite")
-  ) {
+  const vpRegex = /\b(vice president|vp|svp|chief|cto|ceo|executive|c-level|c-suite|vice-president)\b/i;
+  const directorRegex = /\b(director|head|manager|leader)\b/i;
+  const seniorRegex = /\b(senior|sr|staff|lead|principal)\b/i;
+  const entryRegex = /\b(junior|entry|intern|grad|associate|analyst|co-op)\b/i;
+
+  if (vpRegex.test(t)) {
     return 'VP';
   }
   
-  if (
-    t.includes("director") || 
-    t.includes("head") || 
-    t.includes("manager") || 
-    t.includes("leader")
-  ) {
+  if (directorRegex.test(t)) {
     return 'Director';
   }
   
-  if (
-    t.includes("senior") || 
-    t.includes("sr.") || 
-    t.includes("staff") || 
-    t.includes("lead") || 
-    t.includes("principal")
-  ) {
+  if (seniorRegex.test(t)) {
     return 'Senior';
   }
   
-  if (
-    t.includes("junior") || 
-    t.includes("entry") || 
-    t.includes("intern") || 
-    t.includes("grad") || 
-    t.includes("associate") || 
-    t.includes("analyst") ||
-    t.includes("co-op")
-  ) {
+  if (entryRegex.test(t)) {
     return 'Entry';
   }
   
@@ -292,44 +268,46 @@ export async function getJobsForKeywords(keywords: string[], detectedLevel: Care
     let pickedForTier = 0;
     const bucket = levelBuckets[tier];
     
+    // 1. Try to add from query-matched jobs in this tier
     for (const job of bucket) {
       if (tryAddJob(job)) {
         pickedForTier++;
       }
       if (pickedForTier >= targetPickCount) break;
     }
+
+    // 2. If short, backfill from the global DB using jobs of this specific tier
+    if (pickedForTier < targetPickCount) {
+      for (const rawJob of REAL_JOBS_DB) {
+        const job = sanitizeJob(rawJob);
+        if (!job) continue;
+        const jobLvl = getJobLevel(job.title);
+        if (jobLvl === tier) {
+          const formattedJob = {
+            title: job.title,
+            company: job.company,
+            link: job.link,
+            location: job.location,
+            postDate: job.postDate,
+            source: job.source,
+            description: `Verified open position sourced from ${job.source}. Excellent match for your career progression.`
+          };
+          if (tryAddJob(formattedJob)) {
+            pickedForTier++;
+          }
+        }
+        if (pickedForTier >= targetPickCount) break;
+      }
+    }
   });
 
-  // If we don't have enough target jobs, pull remaining from any target tier bucket
+  // If we are STILL short of 6 jobs (e.g. extremely rare DB states), pull remaining from any target tier bucket
   if (selectedJobs.length < 6) {
     for (const tier of targetTiers) {
       const bucket = levelBuckets[tier];
       for (const job of bucket) {
         tryAddJob(job);
         if (selectedJobs.length >= 6) break;
-      }
-      if (selectedJobs.length >= 6) break;
-    }
-  }
-
-  // If we are STILL short of 6 jobs, fallback to load sanitised entries from the global database
-  if (selectedJobs.length < 6) {
-    for (const rawJob of REAL_JOBS_DB) {
-      const job = sanitizeJob(rawJob);
-      if (!job) continue;
-      
-      const jobLvl = getJobLevel(job.title);
-      // Prioritize target tiers first
-      if (targetTiers.includes(jobLvl)) {
-        tryAddJob({
-          title: job.title,
-          company: job.company,
-          link: job.link,
-          location: job.location,
-          postDate: job.postDate,
-          source: job.source,
-          description: `Verified open position sourced from ${job.source}. Excellent match for your career progression.`
-        });
       }
       if (selectedJobs.length >= 6) break;
     }

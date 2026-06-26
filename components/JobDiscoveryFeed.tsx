@@ -7,23 +7,6 @@ interface JobDiscoveryFeedProps {
   isLoading?: boolean;
 }
 
-const getSourceBadgeStyle = (source?: string) => {
-  switch (source) {
-    case "LinkedIn":
-      return "bg-sky-500/10 text-sky-400 border border-sky-500/20";
-    case "Ladders":
-      return "bg-amber-500/10 text-amber-400 border border-amber-500/20";
-    case "Wellfound":
-      return "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
-    case "Built In":
-      return "bg-rose-500/10 text-rose-400 border border-rose-500/20";
-    case "We Work Remotely":
-      return "bg-orange-500/10 text-orange-400 border border-orange-500/20";
-    default:
-      return "bg-slate-500/10 text-slate-400 border border-slate-500/20";
-  }
-};
-
 const getLevelBadgeStyle = (levelLabel?: string) => {
   if (!levelLabel) return "bg-slate-500/10 text-slate-400 border border-slate-500/20";
   const label = levelLabel.toLowerCase();
@@ -41,6 +24,13 @@ const getLevelBadgeStyle = (levelLabel?: string) => {
   }
   return "bg-slate-500/10 text-slate-400 border border-slate-500/20";
 };
+
+const getSourceDisplay = (source?: string) => {
+  if (source === "Built In") return "Built on";
+  if (source === "We Work Remotely") return "Remote Only";
+  return source || "Board";
+};
+
 
 const JobDiscoveryFeed: React.FC<JobDiscoveryFeedProps> = ({
   roles,
@@ -107,7 +97,7 @@ const JobDiscoveryFeed: React.FC<JobDiscoveryFeedProps> = ({
                 {/* Card Header: Company, Title, Match, and Source/Level Badges */}
                 <div className="flex justify-between items-start mb-3">
                   <div>
-                    <div className="text-sm font-semibold text-emerald-450 mb-1 tracking-wide uppercase font-sans">
+                    <div className="text-sm font-semibold text-amber-400 mb-1 tracking-wide uppercase font-sans">
                       {role.company}
                     </div>
 
@@ -135,13 +125,6 @@ const JobDiscoveryFeed: React.FC<JobDiscoveryFeedProps> = ({
 
                       <span className="text-xs text-slate-450 font-semibold uppercase tracking-wider">Match</span>
                     </div>
-
-                    {/* Source Board Badge */}
-                    {role.source && (
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider select-none font-sans ${getSourceBadgeStyle(role.source)}`}>
-                        {role.source}
-                      </span>
-                    )}
 
                     {/* Career Level Badge */}
                     {role.levelLabel && (
@@ -182,7 +165,7 @@ const JobDiscoveryFeed: React.FC<JobDiscoveryFeedProps> = ({
                       onClick={(e) => e.stopPropagation()}
                       className="inline-flex items-center gap-1 text-sm font-semibold text-emerald-440 hover:text-emerald-350 hover:underline transition-colors cursor-pointer"
                     >
-                      Apply on {role.source || 'Board'}
+                      Apply on {getSourceDisplay(role.source)}
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className="h-4 w-4"
