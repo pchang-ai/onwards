@@ -89,7 +89,14 @@ const JobDiscoveryFeed: React.FC<JobDiscoveryFeedProps> = ({
           displayRoles.map((role) => (
             <div
               key={role.id}
-              className="group relative bg-[#0e2018] backdrop-blur-md rounded-2xl hover:bg-[#122b20] hover:shadow-[0_4px_25px_rgba(16,185,129,0.15)] p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-emerald-950/20 flex flex-col justify-between"
+              onClick={() => {
+                if (role.link) {
+                  window.open(role.link, "_blank", "noopener,noreferrer");
+                }
+              }}
+              className={`group relative bg-[#0e2018] backdrop-blur-md rounded-2xl hover:bg-[#122b20] hover:shadow-[0_4px_25px_rgba(16,185,129,0.15)] p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-emerald-950/20 flex flex-col justify-between ${
+                role.link ? "cursor-pointer" : ""
+              }`}
             >
               {/* Glow effect for high matches */}
               {role.matchScore > 90 && (
@@ -104,7 +111,7 @@ const JobDiscoveryFeed: React.FC<JobDiscoveryFeedProps> = ({
                       {role.company}
                     </div>
 
-                    <h4 className="text-xl font-bold text-slate-100 leading-snug">
+                    <h4 className="text-xl font-bold text-slate-100 leading-snug group-hover:text-emerald-400 transition-colors">
                       {role.title}
                     </h4>
 
@@ -172,6 +179,7 @@ const JobDiscoveryFeed: React.FC<JobDiscoveryFeedProps> = ({
                       href={role.link}
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
                       className="inline-flex items-center gap-1 text-sm font-semibold text-emerald-440 hover:text-emerald-350 hover:underline transition-colors cursor-pointer"
                     >
                       Apply on {role.source || 'Board'}

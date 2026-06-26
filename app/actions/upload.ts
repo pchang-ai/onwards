@@ -2,6 +2,43 @@ import { extractMetrics } from "./extract";
 import { getJobsForKeywords } from "./jobSearch";
 
 
+function detectLevelFromFilenameAndBytes(fileName: string, fileBytes: ArrayBuffer): 'Entry' | 'Mid' | 'Senior' | 'Director' | 'VP' {
+  let combinedText = fileName.toLowerCase();
+  try {
+    const textDecoder = new TextDecoder('utf-8', { fatal: false });
+    const partialBytes = fileBytes.slice(0, 50000);
+    combinedText += " " + textDecoder.decode(partialBytes).toLowerCase();
+  } catch (err) {
+    console.error("TextDecoder failed, scanning filename only:", err);
+  }
+
+  // Replace non-alphanumeric characters with spaces to allow \b word boundaries to match correctly
+  const cleanText = combinedText.replace(/[^a-zA-Z0-9]/g, ' ');
+
+  const vpRegex = /\b(vice president|vp|svp|chief|cto|ceo|executive|c-level|c-suite|vice-president)\b/i;
+  const directorRegex = /\b(director|head|manager|leader)\b/i;
+  const seniorRegex = /\b(senior|sr|staff|lead|principal)\b/i;
+  const entryRegex = /\b(junior|entry|intern|grad|associate|analyst|co-op)\b/i;
+
+  if (vpRegex.test(cleanText)) {
+    return "VP";
+  }
+  
+  if (directorRegex.test(cleanText)) {
+    return "Director";
+  }
+  
+  if (seniorRegex.test(cleanText)) {
+    return "Senior";
+  }
+  
+  if (entryRegex.test(cleanText)) {
+    return "Entry";
+  }
+
+  return "Mid";
+}
+
 export async function uploadResume(formData: FormData) {
   const file = formData.get("resume") as File | null;
   
@@ -45,7 +82,9 @@ export async function uploadResume(formData: FormData) {
 
   // 2. Gemini Parsing
   let metrics, roles;
-  let detectedLevel: any = "Director"; // default to Director for fallback/mock
+  let detectedLevel: any = detectLevelFromFilenameAndBytes(file.name, fileBytes);
+  console.log(`Initial level detection from file scan: "${detectedLevel}"`);
+
   
   if (geminiApiKey) {
     try {

@@ -152,6 +152,7 @@ const getWorkoutLink = (title: string) => {
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<Tab>("home");
+  const isFirstRender = useRef(true);
 
   // Sync tab with URL hash on client mount (avoids hydration mismatch)
   useEffect(() => {
@@ -165,6 +166,10 @@ export default function Home() {
 
   // Update hash when activeTab changes
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
     if (typeof window !== "undefined") {
       const currentHash = window.location.hash.replace("#", "");
       if (currentHash !== activeTab) {
