@@ -16,7 +16,14 @@ import {
   ProfileData,
 } from "@/app/actions/rhythm";
 
-import { dailyNewsData, podcastsData, xFeedData, DayNews, Podcast, XAccount } from "@/app/pulseData";
+import {
+  dailyNewsData,
+  podcastsData,
+  xFeedData,
+  DayNews,
+  Podcast,
+  XAccount,
+} from "@/app/pulseData";
 import { fetchLivePulseData } from "@/app/actions/pulse";
 
 import { playgroundAssignments, Assignment } from "@/app/playgroundData";
@@ -145,6 +152,41 @@ const getWorkoutLink = (title: string) => {
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<Tab>("home");
+
+  // Sync tab with URL hash on client mount (avoids hydration mismatch)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const hash = window.location.hash.replace("#", "") as Tab;
+      if (["home", "match", "rhythm", "pulse", "playground"].includes(hash)) {
+        setActiveTab(hash);
+      }
+    }
+  }, []);
+
+  // Update hash when activeTab changes
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const currentHash = window.location.hash.replace("#", "");
+      if (currentHash !== activeTab) {
+        window.location.hash = activeTab;
+      }
+    }
+  }, [activeTab]);
+
+  // Listen for back/forward browser navigation hash changes
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace("#", "") as Tab;
+      if (["home", "match", "rhythm", "pulse", "playground"].includes(hash)) {
+        setActiveTab(hash);
+      }
+    };
+
+    window.addEventListener("hashchange", handleHashChange);
+    return () => {
+      window.removeEventListener("hashchange", handleHashChange);
+    };
+  }, []);
 
   // The Match States
 
@@ -314,7 +356,9 @@ export default function Home() {
   const [podcasts, setPodcasts] = useState<Podcast[]>(podcastsData);
   const [xFeed, setXFeed] = useState<XAccount[]>(xFeedData);
   const [isRefreshingPulse, setIsRefreshingPulse] = useState(false);
-  const [refreshPulseMessage, setRefreshPulseMessage] = useState<string | null>(null);
+  const [refreshPulseMessage, setRefreshPulseMessage] = useState<string | null>(
+    null,
+  );
 
   const handleRefreshPulse = async () => {
     setIsRefreshingPulse(true);
@@ -551,7 +595,11 @@ export default function Home() {
     const audio = audioRef.current;
     if (!audio) return;
 
-    if (isQueuePlaying && currentQueueIndex >= 0 && currentQueueIndex < playlistQueue.length) {
+    if (
+      isQueuePlaying &&
+      currentQueueIndex >= 0 &&
+      currentQueueIndex < playlistQueue.length
+    ) {
       const activeTrack = playlistQueue[currentQueueIndex];
       const targetSrc = getAudioTrackUrl(activeTrack.id);
 
@@ -2219,7 +2267,8 @@ export default function Home() {
                   </h3>
 
                   <p className="text-sm text-slate-400 mt-2 font-light">
-                    Enter your email and your new desired password to update your login credentials.
+                    Enter your email and your new desired password to update
+                    your login credentials.
                   </p>
                 </div>
 
@@ -2783,7 +2832,10 @@ export default function Home() {
                                   "Wednesday-15:00-17:00",
                                   "Friday-11:00-13:00",
                                 ];
-                                const unique = new Set([...prev, ...slotsToAdd]);
+                                const unique = new Set([
+                                  ...prev,
+                                  ...slotsToAdd,
+                                ]);
                                 return Array.from(unique);
                               });
                             } else {
@@ -2881,7 +2933,10 @@ export default function Home() {
                                   "Wednesday-15:00-17:00",
                                   "Friday-11:00-13:00",
                                 ];
-                                const unique = new Set([...prev, ...slotsToAdd]);
+                                const unique = new Set([
+                                  ...prev,
+                                  ...slotsToAdd,
+                                ]);
                                 return Array.from(unique);
                               });
                             }, 1000);
@@ -2932,7 +2987,8 @@ export default function Home() {
                   </h3>
 
                   <p className="text-sm text-slate-400 mt-2 font-light">
-                    Toggle slots where you are always busy (unavailable) or select your peak productivity windows.
+                    Toggle slots where you are always busy (unavailable) or
+                    select your peak productivity windows.
                   </p>
                 </section>
 
@@ -2947,8 +3003,9 @@ export default function Home() {
                         </p>
 
                         <p className="text-[10px] text-slate-400 font-light mt-0.5">
-                          Imported 3 busy meetings from {signedInUser || "user@gmail.com"}{" "}
-                          (Monday 9am, Wednesday 3pm, Friday 11am).
+                          Imported 3 busy meetings from{" "}
+                          {signedInUser || "user@gmail.com"} (Monday 9am,
+                          Wednesday 3pm, Friday 11am).
                         </p>
                       </div>
                     </div>
@@ -4238,8 +4295,8 @@ export default function Home() {
 
                 <p className="text-slate-300 text-xl font-light max-w-3xl mx-auto leading-relaxed">
                   Your consolidated dashboard for real-time news, relevant
-                  podcasts, and key posts from a curated mix of tech influencers,
-                  journalists, and news aggregators.
+                  podcasts, and key posts from a curated mix of tech
+                  influencers, journalists, and news aggregators.
                 </p>
               </div>
 
@@ -4251,15 +4308,38 @@ export default function Home() {
                 >
                   {isRefreshingPulse ? (
                     <>
-                      <svg className="animate-spin h-4 w-4 text-emerald-400" viewBox="0 0 24 24" fill="none">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      <svg
+                        className="animate-spin h-4 w-4 text-emerald-400"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        />
                       </svg>
                       Syncing Latest Feeds...
                     </>
                   ) : (
                     <>
-                      <svg className="h-4 w-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <svg
+                        className="h-4 w-4 text-emerald-400"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
                         <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
                       </svg>
                       Refresh Pulse Feed
@@ -4530,7 +4610,7 @@ export default function Home() {
                           </div>
                         ) : (
                           <div className="flex flex-col gap-4">
-                               <div className="p-4 bg-black/30 rounded-xl flex flex-col gap-3">
+                            <div className="p-4 bg-black/30 rounded-xl flex flex-col gap-3">
                               {isQueuePlaying &&
                                 currentQueueIndex >= 0 &&
                                 currentQueueIndex < playlistQueue.length && (
@@ -4576,7 +4656,9 @@ export default function Home() {
                                     <div className="w-full bg-slate-950 rounded-full h-1.5 mt-1 overflow-hidden">
                                       <div
                                         className="bg-emerald-500 h-full rounded-full transition-all duration-100"
-                                        style={{ width: `${podcastPlayProgress}%` }}
+                                        style={{
+                                          width: `${podcastPlayProgress}%`,
+                                        }}
                                       />
                                     </div>
                                   </div>
@@ -4608,7 +4690,13 @@ export default function Home() {
                                     className="text-slate-400 hover:text-white text-base focus:outline-none"
                                     title={isMuted ? "Unmute" : "Mute"}
                                   >
-                                    {isMuted || volume === 0 ? "🔇" : volume < 0.4 ? "🔈" : volume < 0.7 ? "🔉" : "🔊"}
+                                    {isMuted || volume === 0
+                                      ? "🔇"
+                                      : volume < 0.4
+                                        ? "🔈"
+                                        : volume < 0.7
+                                          ? "🔉"
+                                          : "🔊"}
                                   </button>
                                   <input
                                     type="range"
@@ -4781,7 +4869,7 @@ export default function Home() {
                                                 duration: ep.duration,
 
                                                 podcastName: podcast.title,
-                                                
+
                                                 audioUrl: (ep as any).audioUrl,
                                               }),
                                             );
@@ -4815,7 +4903,8 @@ export default function Home() {
                                                     title: ep.title,
                                                     duration: ep.duration,
                                                     podcastName: podcast.title,
-                                                    audioUrl: (ep as any).audioUrl,
+                                                    audioUrl: (ep as any)
+                                                      .audioUrl,
                                                   },
                                                 ];
                                               });
@@ -4970,7 +5059,7 @@ export default function Home() {
 
                                       <div className="min-w-0">
                                         <a
-                                          href={`https://x.com/${account.handle.replace('@', '')}`}
+                                          href={`https://x.com/${account.handle.replace("@", "")}`}
                                           target="_blank"
                                           rel="noopener noreferrer"
                                           className="text-base font-extrabold text-slate-100 hover:text-sky-400 hover:underline transition-colors duration-200 truncate leading-snug block"
@@ -4979,7 +5068,7 @@ export default function Home() {
                                         </a>
 
                                         <a
-                                          href={`https://x.com/${account.handle.replace('@', '')}`}
+                                          href={`https://x.com/${account.handle.replace("@", "")}`}
                                           target="_blank"
                                           rel="noopener noreferrer"
                                           className="text-sm text-slate-450 hover:text-sky-400 hover:underline transition-colors duration-200 truncate font-medium block"
