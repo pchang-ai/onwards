@@ -91,10 +91,11 @@ export async function pollJobStatus(runId: number) {
           try {
             const parsedResult = JSON.parse(outputData.notebook_output.result);
             let roles = parsedResult.roles || [];
+            const detectedLevel = parsedResult.detectedLevel || "Director";
             try {
               const { getJobsForKeywords } = await import('./jobSearch');
               const keywords = roles.map((r: any) => r.title || r.label || "");
-              roles = await getJobsForKeywords(keywords);
+              roles = await getJobsForKeywords(keywords, detectedLevel);
             } catch (err) {
               console.error("Failed to map Databricks jobs to real jobs:", err);
             }
@@ -116,7 +117,7 @@ export async function pollJobStatus(runId: number) {
       try {
         const { getJobsForKeywords } = await import('./jobSearch');
         const keywords = fallbackRoles.map((r: any) => r.title || r.label || "");
-        fallbackRoles = await getJobsForKeywords(keywords);
+        fallbackRoles = await getJobsForKeywords(keywords, "Director");
       } catch (err) {
         console.error("Failed to map mock jobs to real jobs in pollJobStatus:", err);
       }

@@ -17,6 +17,7 @@ export interface Role {
   location?: string;
   postDate?: string;
   source?: 'LinkedIn' | 'Ladders' | 'Wellfound' | 'Built In' | 'We Work Remotely';
+  levelLabel?: string;
 }
 
 export async function extractMetrics() {

@@ -24,6 +24,24 @@ const getSourceBadgeStyle = (source?: string) => {
   }
 };
 
+const getLevelBadgeStyle = (levelLabel?: string) => {
+  if (!levelLabel) return "bg-slate-500/10 text-slate-400 border border-slate-500/20";
+  const label = levelLabel.toLowerCase();
+  if (label.includes("executive") || label.includes("vp")) {
+    return "bg-amber-500/10 text-amber-400 border border-amber-500/20";
+  }
+  if (label.includes("management") || label.includes("director")) {
+    return "bg-purple-500/10 text-purple-400 border border-purple-500/20";
+  }
+  if (label.includes("senior") || label.includes("lead")) {
+    return "bg-sky-500/10 text-sky-400 border border-sky-500/20";
+  }
+  if (label.includes("professional") || label.includes("mid")) {
+    return "bg-teal-500/10 text-teal-400 border border-teal-500/20";
+  }
+  return "bg-slate-500/10 text-slate-400 border border-slate-500/20";
+};
+
 const JobDiscoveryFeed: React.FC<JobDiscoveryFeedProps> = ({
   roles,
   isLoading,
@@ -79,10 +97,10 @@ const JobDiscoveryFeed: React.FC<JobDiscoveryFeedProps> = ({
               )}
 
               <div className="relative z-10 flex flex-col h-full">
-                {/* Card Header: Company, Title, Match, and Source Badge */}
+                {/* Card Header: Company, Title, Match, and Source/Level Badges */}
                 <div className="flex justify-between items-start mb-3">
                   <div>
-                    <div className="text-sm font-semibold text-emerald-450 mb-1 tracking-wide uppercase">
+                    <div className="text-sm font-semibold text-emerald-450 mb-1 tracking-wide uppercase font-sans">
                       {role.company}
                     </div>
 
@@ -92,7 +110,7 @@ const JobDiscoveryFeed: React.FC<JobDiscoveryFeedProps> = ({
 
                     {/* Location Tag */}
                     {role.location && (
-                      <div className="text-xs text-slate-400 mt-1.5 flex items-center gap-1 select-none">
+                      <div className="text-xs text-slate-400 mt-1.5 flex items-center gap-1 select-none font-sans">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 text-slate-500" viewBox="0 0 20 20" fill="currentColor">
                           <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                         </svg>
@@ -101,20 +119,27 @@ const JobDiscoveryFeed: React.FC<JobDiscoveryFeedProps> = ({
                     )}
                   </div>
 
-                  <div className="flex flex-col items-end gap-2 shrink-0 ml-4">
+                  <div className="flex flex-col items-end gap-1.5 shrink-0 ml-4">
                     {/* Match Percentage */}
-                    <div className="flex items-center gap-1.5 px-3 py-1 bg-slate-950/80 rounded-full shadow-inner select-none">
+                    <div className="flex items-center gap-1.5 px-3 py-1 bg-slate-950/80 rounded-full shadow-inner select-none font-sans">
                       <span className="text-sm font-bold text-white">
                         {role.matchScore}%
                       </span>
 
-                      <span className="text-xs text-slate-400">Match</span>
+                      <span className="text-xs text-slate-450 font-semibold uppercase tracking-wider">Match</span>
                     </div>
 
                     {/* Source Board Badge */}
                     {role.source && (
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider select-none ${getSourceBadgeStyle(role.source)}`}>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider select-none font-sans ${getSourceBadgeStyle(role.source)}`}>
                         {role.source}
+                      </span>
+                    )}
+
+                    {/* Career Level Badge */}
+                    {role.levelLabel && (
+                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded uppercase tracking-wider select-none font-sans ${getLevelBadgeStyle(role.levelLabel)}`}>
+                        {role.levelLabel}
                       </span>
                     )}
                   </div>
@@ -125,7 +150,7 @@ const JobDiscoveryFeed: React.FC<JobDiscoveryFeedProps> = ({
                   <div className="mb-4 inline-flex items-center gap-1.5 select-none">
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
 
-                    <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest">
+                    <span className="text-xs font-bold text-emerald-400 uppercase tracking-widest font-sans">
                       High Value Match
                     </span>
                   </div>
@@ -137,7 +162,7 @@ const JobDiscoveryFeed: React.FC<JobDiscoveryFeedProps> = ({
                 </p>
 
                 {/* Card Footer: Post Date and Active Apply Link */}
-                <div className="mt-auto pt-4 border-t border-emerald-950/20 flex justify-between items-center relative z-20">
+                <div className="mt-auto pt-4 border-t border-emerald-950/20 flex justify-between items-center relative z-20 font-sans">
                   <span className="text-xs text-slate-500 select-none">
                     {role.postDate || 'Open Position'}
                   </span>
@@ -185,4 +210,3 @@ const JobDiscoveryFeed: React.FC<JobDiscoveryFeedProps> = ({
 };
 
 export default JobDiscoveryFeed;
-

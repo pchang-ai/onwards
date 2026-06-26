@@ -45,6 +45,7 @@ export async function uploadResume(formData: FormData) {
 
   // 2. Gemini Parsing
   let metrics, roles;
+  let detectedLevel: any = "Director"; // default to Director for fallback/mock
   
   if (geminiApiKey) {
     try {
@@ -58,7 +59,7 @@ export async function uploadResume(formData: FormData) {
         body: JSON.stringify({
           contents: [{
             parts: [
-              { text: "Analyze this resume. Return a JSON object with two keys: 'metrics' (array of objects with label, value, description) and 'roles' (array of objects with title, match, description). Ensure you include the $15M OpEx reduction and 600% AI acceleration wins. RETURN ONLY VALID JSON." },
+              { text: "Analyze this resume. Return a JSON object with three keys: 'metrics' (array of objects with label, value, description), 'detectedLevel' (one of: 'Entry', 'Mid', 'Senior', 'Director', 'VP' depending on candidate's experience level), and 'roles' (array of objects with title, match, description). Ensure you include the $15M OpEx reduction and 600% AI acceleration wins. RETURN ONLY VALID JSON." },
               { inline_data: { mime_type: file.type || "application/pdf", data: base64Data } }
             ]
           }]
@@ -72,7 +73,10 @@ export async function uploadResume(formData: FormData) {
         const parsed = JSON.parse(textResponse);
         metrics = parsed.metrics;
         roles = parsed.roles;
-        console.log("Gemini extraction successful!");
+        if (parsed.detectedLevel) {
+          detectedLevel = parsed.detectedLevel;
+        }
+        console.log(`Gemini extraction successful! Detected level: ${detectedLevel}`);
       } else {
         console.error("Gemini failed:", await geminiRes.text());
       }
@@ -92,8 +96,8 @@ export async function uploadResume(formData: FormData) {
   // Retrieve real jobs for the candidate instead of fake/hallucinated ones
   try {
     const keywords = roles.map((r: any) => r.title || r.label || "");
-    console.log("Matching extracted roles/skills to real jobs:", keywords);
-    roles = await getJobsForKeywords(keywords);
+    console.log(`Matching extracted roles/skills to real jobs at level: "${detectedLevel}"`);
+    roles = await getJobsForKeywords(keywords, detectedLevel);
   } catch (error) {
     console.error("Error fetching real jobs during upload:", error);
     // Keep fallback roles if searching fails completely

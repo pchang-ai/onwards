@@ -33,7 +33,7 @@ export const REAL_JOBS_DB: RealJob[] = [
     "source": "LinkedIn"
   },
   {
-    "title": "VP, AI &amp Applications",
+    "title": "VP, AI & Applications",
     "company": "Utilidata",
     "link": "https://www.linkedin.com/jobs/view/vp-ai-applications-at-utilidata-4412976062?position=4&pageNum=0&refId=wIq0E8jU7W0BOAE7dRyuHQ%3D%3D&trackingId=7qlXbj10N0gaPyuXfK8YSg%3D%3D",
     "location": "Ann Arbor, MI",
@@ -49,7 +49,7 @@ export const REAL_JOBS_DB: RealJob[] = [
     "source": "LinkedIn"
   },
   {
-    "title": "VP, AI Innovation &amp Enablement Leader",
+    "title": "VP, AI Innovation & Enablement Leader",
     "company": "LPL Financial",
     "link": "https://www.linkedin.com/jobs/view/vp-ai-innovation-enablement-leader-at-lpl-financial-4398053080?position=6&pageNum=0&refId=wIq0E8jU7W0BOAE7dRyuHQ%3D%3D&trackingId=rExWttdWHPaqMkM38eQfZg%3D%3D",
     "location": "San Diego, CA",
@@ -113,7 +113,7 @@ export const REAL_JOBS_DB: RealJob[] = [
     "source": "Ladders"
   },
   {
-    "title": "Director of Machine Learning &amp Artificial Intelligence",
+    "title": "Director of Machine Learning & Artificial Intelligence",
     "company": "Domino's",
     "link": "https://www.linkedin.com/jobs/view/director-of-machine-learning-artificial-intelligence-at-domino-s-4427362453?position=7&pageNum=0&refId=V0Reo2mDHbPBVXMOxr7KAg%3D%3D&trackingId=3%2FyoCJEDlm7cMmMgdgco%2Bw%3D%3D",
     "location": "Ann Arbor, MI",
@@ -345,7 +345,7 @@ export const REAL_JOBS_DB: RealJob[] = [
     "source": "LinkedIn"
   },
   {
-    "title": "Data Science &amp Machine Learning Product Manager - 254831",
+    "title": "Data Science & Machine Learning Product Manager - 254831",
     "company": "Medix Technology",
     "link": "https://www.linkedin.com/jobs/view/data-science-machine-learning-product-manager-254831-at-medix-technology-4426829799?position=8&pageNum=0&refId=lMGGr9e3Wu%2BaW5IC1APuDg%3D%3D&trackingId=QQvfo0lKXnl4uDW2lgeBFg%3D%3D",
     "location": "United States",
@@ -385,14 +385,6 @@ export const REAL_JOBS_DB: RealJob[] = [
     "source": "LinkedIn"
   },
   {
-    "title": "{[ content.title ]}",
-    "company": "TwinThread",
-    "link": "https://www.linkedin.com/jobs/view/content-title-at-twinthread-4405573654?position=4&pageNum=0&refId=MUYkmtBNZVieh%2BVlIyvAHw%3D%3D&trackingId=XYUPrTxVpSWuZk0bnj2dCg%3D%3D",
-    "location": "Charlottesville, VA",
-    "postDate": "2 months ago",
-    "source": "Ladders"
-  },
-  {
     "title": "Front-End Web Developer",
     "company": "Socure",
     "link": "https://www.linkedin.com/jobs/view/front-end-web-developer-at-socure-4421864490?position=5&pageNum=0&refId=MUYkmtBNZVieh%2BVlIyvAHw%3D%3D&trackingId=ZgumXo1ukm8EnZLhXf9scQ%3D%3D",
@@ -426,7 +418,7 @@ export const REAL_JOBS_DB: RealJob[] = [
   },
   {
     "title": "Software Engineer / Front End Web Developer",
-    "company": "Room &amp Board",
+    "company": "Room & Board",
     "link": "https://www.linkedin.com/jobs/view/software-engineer-front-end-web-developer-at-room-board-4406100967?position=9&pageNum=0&refId=MUYkmtBNZVieh%2BVlIyvAHw%3D%3D&trackingId=UGJGijVpIEwTId%2B1q9wzCw%3D%3D",
     "location": "Golden Valley, MN",
     "postDate": "2 months ago",

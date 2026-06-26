@@ -1,11 +1,105 @@
-"use server";
-
 import { Role } from "./extract";
-import { REAL_JOBS_DB, RealJob } from "./realJobsDb";
+import { REAL_JOBS_DB } from "./realJobsDb";
+import { sanitizeJob } from "./sanitizer";
+
+export type CareerLevel = 'Entry' | 'Mid' | 'Senior' | 'Director' | 'VP';
+
+/**
+ * Classifies a job posting into a standard career level based on title keywords.
+ */
+export function getJobLevel(title: string): CareerLevel {
+  const t = title.toLowerCase();
+  
+  if (
+    t.includes("vice president") || 
+    t.includes("vp") || 
+    t.includes("svp") || 
+    t.includes("chief") || 
+    t.includes("cto") || 
+    t.includes("ceo") || 
+    t.includes("executive") || 
+    t.includes("c-level") ||
+    t.includes("c-suite")
+  ) {
+    return 'VP';
+  }
+  
+  if (
+    t.includes("director") || 
+    t.includes("head") || 
+    t.includes("manager") || 
+    t.includes("leader")
+  ) {
+    return 'Director';
+  }
+  
+  if (
+    t.includes("senior") || 
+    t.includes("sr.") || 
+    t.includes("staff") || 
+    t.includes("lead") || 
+    t.includes("principal")
+  ) {
+    return 'Senior';
+  }
+  
+  if (
+    t.includes("junior") || 
+    t.includes("entry") || 
+    t.includes("intern") || 
+    t.includes("grad") || 
+    t.includes("associate") || 
+    t.includes("analyst") ||
+    t.includes("co-op")
+  ) {
+    return 'Entry';
+  }
+  
+  return 'Mid';
+}
+
+/**
+ * Maps a job level to a premium, user-facing level description.
+ */
+export function getLevelLabel(level: CareerLevel): string {
+  switch (level) {
+    case 'Entry':
+      return 'Associate Level';
+    case 'Mid':
+      return 'Professional Level';
+    case 'Senior':
+      return 'Senior / Lead Level';
+    case 'Director':
+      return 'Management / Director Level';
+    case 'VP':
+      return 'Executive / VP Level';
+  }
+}
+
+/**
+ * Determines the three target career levels to search based on the candidate's level.
+ * Always returns a range of 3 levels.
+ */
+export function getTargetLevels(level: CareerLevel): CareerLevel[] {
+  switch (level) {
+    case 'Entry':
+      return ['Entry', 'Mid', 'Senior'];
+    case 'Mid':
+      return ['Entry', 'Mid', 'Senior'];
+    case 'Senior':
+      return ['Mid', 'Senior', 'Director'];
+    case 'Director':
+      return ['Senior', 'Director', 'VP'];
+    case 'VP':
+      return ['Director', 'VP', 'VP']; // Clamped to highest
+    default:
+      return ['Mid', 'Senior', 'Director'];
+  }
+}
 
 /**
  * Fetches real jobs dynamically from LinkedIn's guest search API.
- * Returns an empty array if rate-limited or blocked.
+ * Cleans and sanitizes all results, rejecting any placeholders or malformed titles.
  */
 async function fetchLiveLinkedInJobs(keyword: string): Promise<Omit<Role, "id" | "matchScore">[]> {
   const url = `https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search?keywords=${encodeURIComponent(keyword)}&location=United%20States&start=0`;
@@ -14,7 +108,7 @@ async function fetchLiveLinkedInJobs(keyword: string): Promise<Omit<Role, "id" |
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
       },
-      next: { revalidate: 3600 } // Cache results for 1 hour to avoid rate-limiting
+      next: { revalidate: 3600 } // Cache results for 1 hour
     });
 
     if (!response.ok) {
@@ -31,7 +125,7 @@ async function fetchLiveLinkedInJobs(keyword: string): Promise<Omit<Role, "id" |
       if (!block.includes('job-search-card')) continue;
 
       const linkMatch = block.match(/<a class="base-card__full-link[^"]*" href="([^"]*)"/);
-      const link = linkMatch ? linkMatch[1].replace(/&amp;/g, '&') : '';
+      const link = linkMatch ? linkMatch[1] : '';
 
       const titleMatch = block.match(/<h3 class="base-search-card__title">([\s\S]*?)<\/h3>/);
       const title = titleMatch ? titleMatch[1].trim() : '';
@@ -51,16 +145,22 @@ async function fetchLiveLinkedInJobs(keyword: string): Promise<Omit<Role, "id" |
       const dateMatch = block.match(/<time[^>]*>([\s\S]*?)<\/time>/);
       const postDate = dateMatch ? dateMatch[1].replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim() : '';
 
-      if (title && company) {
-        jobs.push({
+      if (title && company && link) {
+        const rawJob = {
           title,
           company,
           link,
           location,
           postDate,
-          source: 'LinkedIn',
+          source: 'LinkedIn' as const,
           description: `Analyze this open role for alignment with your skills. Sourced from the live LinkedIn job board.`
-        });
+        };
+
+        // Strict sanitation runtime verification
+        const sanitized = sanitizeJob(rawJob);
+        if (sanitized) {
+          jobs.push(sanitized);
+        }
       }
     }
     return jobs;
@@ -72,61 +172,63 @@ async function fetchLiveLinkedInJobs(keyword: string): Promise<Omit<Role, "id" |
 
 /**
  * Searches the local database containing curated Wellfound, Built In, Ladders, and LinkedIn jobs.
- * Scores matches based on word/keyword overlap.
+ * Sanitizes and verifies all records, filtering by query keywords.
  */
 function searchLocalDatabase(keywords: string[]): Omit<Role, "id" | "matchScore">[] {
   const queryWords = keywords
     .flatMap(k => k.toLowerCase().split(/\s+/))
     .filter(word => word.length > 1);
 
-  const scoredJobs = REAL_JOBS_DB.map(job => {
-    let score = 0;
+  const matched: Omit<Role, "id" | "matchScore">[] = [];
+
+  for (const rawJob of REAL_JOBS_DB) {
+    const job = sanitizeJob(rawJob);
+    if (!job) continue;
+
+    let matchedWordCount = 0;
     const titleLower = job.title.toLowerCase();
 
-    // Check query word overlaps in job title
     queryWords.forEach(word => {
       if (titleLower.includes(word)) {
-        score += 5; // Title word match gets high weight
+        matchedWordCount++;
       }
     });
 
-    // Check specific high-level category alignments
+    // Check specific alignments
     const isAiQuery = keywords.some(k => k.toLowerCase().match(/(ai|artificial|ml|machine|intelligence)/));
     const isAiJob = titleLower.match(/(ai|artificial|ml|machine|deep learning|intelligence|neural)/);
-    if (isAiQuery && isAiJob) score += 10;
-
+    
     const isFrontendQuery = keywords.some(k => k.toLowerCase().match(/(frontend|front-end|react|web|ui)/));
     const isFrontendJob = titleLower.match(/(frontend|front-end|react|web|ui|javascript)/);
-    if (isFrontendQuery && isFrontendJob) score += 10;
 
-    return { job, score };
-  });
+    const isMatch = matchedWordCount > 0 || (isAiQuery && isAiJob) || (isFrontendQuery && isFrontendJob);
+    
+    if (isMatch) {
+      matched.push({
+        title: job.title,
+        company: job.company,
+        link: job.link,
+        location: job.location,
+        postDate: job.postDate,
+        source: job.source,
+        description: `Verified open position sourced from ${job.source}. Excellent match for your background and career target.`
+      });
+    }
+  }
 
-  // Filter out zero scores, sort by highest score, and map to output format
-  return scoredJobs
-    .filter(item => item.score > 0)
-    .sort((a, b) => b.score - a.score)
-    .map(item => ({
-      title: item.job.title,
-      company: item.job.company,
-      link: item.job.link,
-      location: item.job.location,
-      postDate: item.job.postDate,
-      source: item.job.source,
-      description: `Verified open position sourced from ${item.job.source}. Excellent match for your background and career target.`
-    }));
+  return matched;
 }
 
 /**
- * Main orchestrator: gets open jobs for keywords, combining live scraping and local database matches.
+ * Main orchestrator: gets open jobs for keywords, calibrated across 3 consecutive career levels.
  */
-export async function getJobsForKeywords(keywords: string[]): Promise<Role[]> {
+export async function getJobsForKeywords(keywords: string[], detectedLevel: CareerLevel = "Director"): Promise<Role[]> {
   const cleanKeywords = keywords.length > 0 ? keywords : ["AI Engineer", "Software Engineer"];
-  console.log("Retrieving jobs for search terms:", cleanKeywords);
+  console.log(`Retrieving jobs for terms: [${cleanKeywords.join(", ")}], calibrated for level: "${detectedLevel}"`);
 
   const fetchedJobs: Omit<Role, "id" | "matchScore">[] = [];
 
-  // 1. Attempt live scraping for first 2 keywords to avoid too many outbound calls
+  // 1. Attempt live scraping for first 2 keywords to keep feeds fresh
   const liveQueries = cleanKeywords.slice(0, 2);
   for (const query of liveQueries) {
     const liveResults = await fetchLiveLinkedInJobs(query);
@@ -135,7 +237,7 @@ export async function getJobsForKeywords(keywords: string[]): Promise<Role[]> {
     }
   }
 
-  // 2. Fetch from local database to get representation from other boards (Ladders, Wellfound, Built In)
+  // 2. Fetch from our clean, multi-board local database
   const databaseResults = searchLocalDatabase(cleanKeywords);
   fetchedJobs.push(...databaseResults);
 
@@ -151,41 +253,131 @@ export async function getJobsForKeywords(keywords: string[]): Promise<Role[]> {
     }
   }
 
-  // 4. If we still don't have enough jobs, fill with random database listings to ensure a full list
-  if (uniqueJobs.length < 6) {
-    for (const job of REAL_JOBS_DB) {
-      const key = `${job.title.toLowerCase()}|${job.company.toLowerCase()}`;
-      if (!seen.has(key)) {
-        seen.add(key);
-        uniqueJobs.push({
+  // 4. Group unique jobs into career level buckets
+  const levelBuckets: Record<CareerLevel, Omit<Role, "id" | "matchScore">[]> = {
+    Entry: [],
+    Mid: [],
+    Senior: [],
+    Director: [],
+    VP: []
+  };
+
+  uniqueJobs.forEach(job => {
+    const lvl = getJobLevel(job.title);
+    levelBuckets[lvl].push(job);
+  });
+
+  // 5. Select calibrated range of three levels: Level - 1, Level, Level + 1
+  const targetTiers = getTargetLevels(detectedLevel);
+  console.log(`Three-tier match target levels: [${targetTiers.join(", ")}]`);
+
+  const selectedJobs: Omit<Role, "id" | "matchScore">[] = [];
+  const selectedKeys = new Set<string>();
+
+  // Helper to safely add to final list
+  const tryAddJob = (job: Omit<Role, "id" | "matchScore">) => {
+    const key = `${job.title.toLowerCase()}|${job.company.toLowerCase()}`;
+    if (!selectedKeys.has(key)) {
+      selectedKeys.add(key);
+      selectedJobs.push(job);
+      return true;
+    }
+    return false;
+  };
+
+  // Try to pick at least 2 jobs from each of the three target tiers
+  const targetPickCount = 2;
+  
+  targetTiers.forEach(tier => {
+    let pickedForTier = 0;
+    const bucket = levelBuckets[tier];
+    
+    for (const job of bucket) {
+      if (tryAddJob(job)) {
+        pickedForTier++;
+      }
+      if (pickedForTier >= targetPickCount) break;
+    }
+  });
+
+  // If we don't have enough target jobs, pull remaining from any target tier bucket
+  if (selectedJobs.length < 6) {
+    for (const tier of targetTiers) {
+      const bucket = levelBuckets[tier];
+      for (const job of bucket) {
+        tryAddJob(job);
+        if (selectedJobs.length >= 6) break;
+      }
+      if (selectedJobs.length >= 6) break;
+    }
+  }
+
+  // If we are STILL short of 6 jobs, fallback to load sanitised entries from the global database
+  if (selectedJobs.length < 6) {
+    for (const rawJob of REAL_JOBS_DB) {
+      const job = sanitizeJob(rawJob);
+      if (!job) continue;
+      
+      const jobLvl = getJobLevel(job.title);
+      // Prioritize target tiers first
+      if (targetTiers.includes(jobLvl)) {
+        tryAddJob({
           title: job.title,
           company: job.company,
           link: job.link,
           location: job.location,
           postDate: job.postDate,
           source: job.source,
-          description: `Verified open position sourced from ${job.source}. Direct match for your target career sector.`
+          description: `Verified open position sourced from ${job.source}. Excellent match for your career progression.`
         });
       }
-      if (uniqueJobs.length >= 8) break;
+      if (selectedJobs.length >= 6) break;
     }
   }
 
-  // 5. Limit final set to 8 jobs and assign IDs and premium match scores
-  // Ensure the top 4 are high matches (glow effect) and the rest decrease slightly
-  const baseScores = [98, 96, 94, 91, 88, 85, 82, 79];
-  
-  const finalRoles: Role[] = uniqueJobs.slice(0, 8).map((job, idx) => ({
-    id: idx + 1,
-    title: job.title,
-    company: job.company,
-    matchScore: baseScores[idx] || (80 - idx),
-    description: job.description,
-    link: job.link,
-    location: job.location,
-    postDate: job.postDate,
-    source: job.source
-  }));
+  // Double fallback: add any clean jobs from the DB to make sure we always have 6 cards
+  if (selectedJobs.length < 6) {
+    for (const rawJob of REAL_JOBS_DB) {
+      const job = sanitizeJob(rawJob);
+      if (!job) continue;
+      
+      tryAddJob({
+        title: job.title,
+        company: job.company,
+        link: job.link,
+        location: job.location,
+        postDate: job.postDate,
+        source: job.source,
+        description: `Verified open position sourced from ${job.source}. Match insights for your target profile.`
+      });
+      if (selectedJobs.length >= 6) break;
+    }
+  }
+
+  // 6. Map to final Role structure and assign matched scores (with top positions getting highest scores)
+  // Sort so that VP/Director level jobs appear at the top, then Senior, then Mid/Entry
+  const sortedJobs = selectedJobs.slice(0, 6).sort((a, b) => {
+    const order: Record<CareerLevel, number> = { VP: 5, Director: 4, Senior: 3, Mid: 2, Entry: 1 };
+    return order[getJobLevel(b.title)] - order[getJobLevel(a.title)];
+  });
+
+  const baseScores = [98, 95, 92, 89, 86, 83];
+
+  const finalRoles: Role[] = sortedJobs.map((job, idx) => {
+    const jobLvl = getJobLevel(job.title);
+    return {
+      id: idx + 1,
+      title: job.title,
+      company: job.company,
+      matchScore: baseScores[idx] || (85 - idx),
+      description: job.description,
+      link: job.link,
+      location: job.location,
+      postDate: job.postDate,
+      source: job.source,
+      levelLabel: getLevelLabel(jobLvl)
+    };
+  });
 
   return finalRoles;
 }
