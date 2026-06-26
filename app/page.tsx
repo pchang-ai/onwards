@@ -16,7 +16,8 @@ import {
   ProfileData,
 } from "@/app/actions/rhythm";
 
-import { dailyNewsData, podcastsData, xFeedData } from "@/app/pulseData";
+import { dailyNewsData, podcastsData, xFeedData, DayNews, Podcast, XAccount } from "@/app/pulseData";
+import { fetchLivePulseData } from "@/app/actions/pulse";
 
 import { playgroundAssignments, Assignment } from "@/app/playgroundData";
 
@@ -308,6 +309,43 @@ export default function Home() {
   const [consensusSectionExpanded, setConsensusSectionExpanded] =
     useState(true);
 
+  // The Pulse Dynamic States
+  const [newsData, setNewsData] = useState<DayNews[]>(dailyNewsData);
+  const [podcasts, setPodcasts] = useState<Podcast[]>(podcastsData);
+  const [xFeed, setXFeed] = useState<XAccount[]>(xFeedData);
+  const [isRefreshingPulse, setIsRefreshingPulse] = useState(false);
+  const [refreshPulseMessage, setRefreshPulseMessage] = useState<string | null>(null);
+
+  const handleRefreshPulse = async () => {
+    setIsRefreshingPulse(true);
+    setRefreshPulseMessage(null);
+    try {
+      const freshData = await fetchLivePulseData();
+      if (freshData) {
+        setNewsData(freshData.news);
+        setPodcasts(freshData.podcasts);
+        setXFeed(freshData.xFeed);
+
+        setExpandedDays((prev) => {
+          const next = { ...prev };
+          freshData.news.forEach((day, idx) => {
+            next[day.date] = idx === 0;
+          });
+          return next;
+        });
+
+        setRefreshPulseMessage("✓ Pulse feeds synchronized with live data!");
+        setTimeout(() => setRefreshPulseMessage(null), 4000);
+      }
+    } catch (err) {
+      console.error("Failed to sync pulse data:", err);
+      setRefreshPulseMessage("❌ Sync failed. Sourcing offline backup.");
+      setTimeout(() => setRefreshPulseMessage(null), 4000);
+    } finally {
+      setIsRefreshingPulse(false);
+    }
+  };
+
   const [expandedDays, setExpandedDays] = useState<Record<string, boolean>>(
     () => {
       const initial: Record<string, boolean> = {};
@@ -351,6 +389,8 @@ export default function Home() {
     duration: string;
 
     podcastName: string;
+
+    audioUrl?: string;
   }
 
   const [playlistQueue, setPlaylistQueue] = useState<PlaylistItem[]>([]);
@@ -398,6 +438,18 @@ export default function Home() {
 
   // Maps episode IDs to real, fast-loading, public test MP3 files
   const getAudioTrackUrl = (episodeId: string): string => {
+    // 1. Check if the episode exists in the dynamic podcasts state and has a live audioUrl
+    for (const pod of podcasts) {
+      const ep = pod.episodes.find((e) => e.id === episodeId);
+      if (ep && (ep as any).audioUrl) {
+        return (ep as any).audioUrl;
+      }
+    }
+    // 2. Also check the playlistQueue item
+    const queueItem = playlistQueue.find((item) => item.id === episodeId);
+    if (queueItem && queueItem.audioUrl) {
+      return queueItem.audioUrl;
+    }
     switch (episodeId) {
       // AI Daily Brief
       case "ep-1-1":
@@ -4178,16 +4230,49 @@ export default function Home() {
 
         {activeTab === "pulse" && (
           <div className="w-full max-w-6xl mx-auto flex flex-col items-stretch pt-8 animate-in fade-in duration-500 gap-6">
-            <section className="text-center mb-6">
-              <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight mb-4">
-                The Pulse.
-              </h2>
+            <section className="text-center mb-6 flex flex-col items-center gap-4">
+              <div>
+                <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight mb-4">
+                  The Pulse.
+                </h2>
 
-              <p className="text-slate-300 text-xl font-light max-w-3xl mx-auto leading-relaxed">
-                Your consolidated dashboard for real-time news, relevant
-                podcasts, and key posts from a curated mix of tech influencers,
-                journalists, and news aggregators.
-              </p>
+                <p className="text-slate-300 text-xl font-light max-w-3xl mx-auto leading-relaxed">
+                  Your consolidated dashboard for real-time news, relevant
+                  podcasts, and key posts from a curated mix of tech influencers,
+                  journalists, and news aggregators.
+                </p>
+              </div>
+
+              <div className="flex flex-col items-center gap-3">
+                <button
+                  onClick={handleRefreshPulse}
+                  disabled={isRefreshingPulse}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-emerald-500/10 hover:bg-emerald-500/20 active:bg-emerald-500/30 border border-emerald-500/30 text-emerald-400 hover:text-emerald-300 text-sm font-extrabold transition-all duration-300 shadow-[0_0_15px_rgba(16,185,129,0.05)] hover:shadow-[0_0_20px_rgba(16,185,129,0.15)] disabled:opacity-50"
+                >
+                  {isRefreshingPulse ? (
+                    <>
+                      <svg className="animate-spin h-4 w-4 text-emerald-400" viewBox="0 0 24 24" fill="none">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      Syncing Latest Feeds...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="h-4 w-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+                      </svg>
+                      Refresh Pulse Feed
+                    </>
+                  )}
+                </button>
+
+                {refreshPulseMessage && (
+                  <div className="text-xs font-semibold px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 animate-in fade-in slide-in-from-top-1 duration-200">
+                    {refreshPulseMessage}
+                  </div>
+                )}
+              </div>
             </section>
 
             {/* Unified Pulse Layout: Grid System */}
@@ -4231,7 +4316,7 @@ export default function Home() {
 
                   {newsSectionExpanded && (
                     <div className="flex flex-col gap-5 animate-in fade-in slide-in-from-top-2 duration-300">
-                      {dailyNewsData.slice(0, 3).map((dayData) => {
+                      {newsData.slice(0, 3).map((dayData) => {
                         const isDayExpanded = expandedDays[dayData.date];
 
                         return (
@@ -4611,14 +4696,12 @@ export default function Home() {
                         )}
                       </div>
 
-                      {/* Podcasts Catalogue Accordion */}
-
                       <div className="space-y-4">
                         <label className="block text-xs font-bold text-slate-450 uppercase tracking-widest">
                           Podcast Catalogue
                         </label>
 
-                        {podcastsData.map((podcast) => {
+                        {podcasts.map((podcast) => {
                           const isPodExpanded =
                             expandedPodcastId === podcast.id;
 
@@ -4698,6 +4781,8 @@ export default function Home() {
                                                 duration: ep.duration,
 
                                                 podcastName: podcast.title,
+                                                
+                                                audioUrl: (ep as any).audioUrl,
                                               }),
                                             );
                                           }}
@@ -4730,6 +4815,7 @@ export default function Home() {
                                                     title: ep.title,
                                                     duration: ep.duration,
                                                     podcastName: podcast.title,
+                                                    audioUrl: (ep as any).audioUrl,
                                                   },
                                                 ];
                                               });
@@ -4844,7 +4930,7 @@ export default function Home() {
                       {/* Voices Cards Grid */}
 
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {xFeedData
+                        {xFeed
 
                           .filter((account) =>
                             selectedVoiceCategories.includes(account.category),
@@ -5134,7 +5220,7 @@ export default function Home() {
                   </div>
 
                   <div className="space-y-4 overflow-y-auto pr-1 flex-grow custom-scrollbar">
-                    {dailyNewsData.map((dayData) => {
+                    {newsData.map((dayData) => {
                       const isDayExpanded = expandedDays[dayData.date];
 
                       return (
