@@ -2,12 +2,33 @@
 
 import { DayNews, Podcast, XAccount, dailyNewsData, podcastsData, xFeedData, getRelativeDate } from "../pulseData";
 
-// Helper to decode HTML entities
+// Helper to decode HTML entities and clean up typography/boilerplate
 function cleanText(text: string): string {
   if (!text) return "";
-  return text
+  let cleaned = text
     .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1")
-    .replace(/<[^>]*>/g, "")
+    .replace(/<[^>]*>/g, ""); // remove HTML tags
+
+  // Decode decimal HTML entities (e.g., &#8217; or &#8230;)
+  cleaned = cleaned.replace(/&#(\d+);/g, (match, dec) => {
+    try {
+      return String.fromCharCode(Number(dec));
+    } catch {
+      return match;
+    }
+  });
+
+  // Decode hexadecimal HTML entities (e.g., &#x2019;)
+  cleaned = cleaned.replace(/&#x([0-9a-fA-F]+);/g, (match, hex) => {
+    try {
+      return String.fromCharCode(parseInt(hex, 16));
+    } catch {
+      return match;
+    }
+  });
+
+  cleaned = cleaned
+    // Decode common HTML entities
     .replace(/&amp;/g, "&")
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
@@ -15,8 +36,27 @@ function cleanText(text: string): string {
     .replace(/&#39;/g, "'")
     .replace(/&apos;/g, "'")
     .replace(/&nbsp;/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+    .replace(/&#039;/g, "'")
+    .replace(/&mdash;/g, " — ")
+    .replace(/&ndash;/g, "-")
+    .replace(/&ldquo;/g, '"')
+    .replace(/&rdquo;/g, '"')
+    .replace(/&lsquo;/g, "'")
+    .replace(/&rsquo;/g, "'")
+    .replace(/&hellip;/g, "...")
+    .replace(/&middot;/g, "·")
+    // Decode unicode equivalents
+    .replace(/\u2014/g, " — ") // em-dash
+    .replace(/\u2013/g, "-")   // en-dash
+    .replace(/[\u201c\u201d]/g, '"') // smart double quotes
+    .replace(/[\u2018\u2019]/g, "'") // smart single quotes
+    .replace(/\u2026/g, "...") // ellipsis
+    .replace(/\u00b7/g, "·");  // middle dot
+
+  // Remove garbage suffixes common in feeds
+  cleaned = cleaned.replace(/The post .* appeared first on .*/gi, "");
+
+  return cleaned.replace(/\s+/g, " ").trim();
 }
 
 interface RawArticle {
@@ -341,7 +381,13 @@ Return your output as a single, valid JSON object matching this schema:
   ]
 }
 
-DO NOT wrap your response in markdown code blocks or any conversational text. Return only the raw JSON.
+DO NOT include any markdown code blocks, formatting, or conversational text. Return only the raw JSON.
+
+TYPOGRAPHY & ACCURACY RULES:
+1. Ensure there are absolutely no spelling errors, typos, or smart quotes in the output. Use standard straight double quotes (") and standard straight single quotes (').
+2. Do not output any em-dashes (—). Replace them with a standard space-hyphen-space " - " or rewrite the text to avoid them.
+3. Clean all text of any raw HTML tags, CDATA remnants, or corporate boilerplate.
+4. Ensure the tweets read as authentic, professional social posts matching the tone of each key voice.
 `;
 
       const response = await fetch(geminiUrl, {
@@ -431,14 +477,14 @@ DO NOT wrap your response in markdown code blocks or any conversational text. Re
             {
               id: `${account.handle}-live-1`,
               timestamp: new Date(matchedArticles[0].pubDate).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }),
-              text: `${matchedArticles[0].title}. Sourced from our live feed: ${matchedArticles[0].link}`,
+              text: `${matchedArticles[0].title} ${matchedArticles[0].link}`,
               likes: "4.5k",
               retweets: "1.2k"
             },
             {
               id: `${account.handle}-live-2`,
               timestamp: new Date(matchedArticles[1].pubDate).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }),
-              text: `${matchedArticles[1].title}. Sourced from our live feed: ${matchedArticles[1].link}`,
+              text: `${matchedArticles[1].title} ${matchedArticles[1].link}`,
               likes: "3.1k",
               retweets: "780"
             }
