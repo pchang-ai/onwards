@@ -265,11 +265,35 @@ export async function fetchLivePulseData(): Promise<{
       const prompt = `
 You are a senior tech news editor and researcher. Analyze the following raw tech/business articles and search the web for the actual current state of these topics.
 
+To select and filter the news briefings to show, you MUST strictly apply the following criteria:
+
+1. Enterprise Utility & Strategic Drift (Weight: 40%)
+Core Question: Does this news change how a company operates, hires, or builds its business model over the next 1 to 3 years?
+High Rank: Framework shifts, such as moving from experimental AI models to governed, production-ready systems (e.g., Broadcom's "Agentic Runtime" or GitHub's usage-based pricing models, OpenAI and Broadcom partnering to unveil custom AI chip 'Jalapeno').
+Low Rank: Product press releases, incremental software version updates, or generic executive quotes about "the power of AI."
+
+2. Geopolitical & Global Supply Chain Interdependence (Weight: 30%)
+Core Question: Does this event introduce localized volatility that triggers a domino effect across international business networks?
+High Rank: Events directly squeezing industrial inputs, such as memory chip shortages through 2027, cross-border tech M&A blockages (e.g., the Meta/Manus acquisition block), or maritime trade choke points directly affecting consumer margins.
+Low Rank: Domestic political rhetoric, isolated legal disputes that don't establish regulatory precedent, or localized public sentiment polls.
+
+3. Market Structural Adjustments over Speculative Value (Weight: 20%)
+Core Question: Is this a permanent fundamental change in how a market or industry is capitalized, or is it just a transient price swing?
+High Rank: Structural transformations, such as the confidential IPO filings of major players like OpenAI and Anthropic, landmark monopoly verdicts (e.g., Live Nation), or shifts in corporate capitalization frameworks (e.g., using Bitcoin as a primary reserve asset).
+Low Rank: Daily stock market movements, temporary after-hours dips, or meme-driven trading spikes.
+
+4. Regional Macro Barometers (Weight: 10%)
+Core Question: Does this local data reflect a broader macroeconomic trend that echoes what is happening globally?
+High Rank: Hard economic data serving as a bellwether, such as the 111% Seattle homeownership premium (reflecting broader wealth disparities), wealth tax revenue windfalls, or massive transit infrastructure stress tests (e.g., the World Cup logistics).
+Low Rank: Commute-specific traffic alerts, minor localized property crimes, or standard seasonal event schedules.
+
+The Filter Rule: If a news story cannot answer "What operational or financial adjustments should an enterprise leader make because of this?", it is filtered out to maintain a clean, scannable format.
+
 Generate:
 1. "news": Exactly 3 days of news briefings: Today, Yesterday, and 2 days ago.
    - For each of these 3 days, select exactly 10 high-quality, real-world tech/business briefings (total 30 briefings).
    - Use dates: Today is "${getRelativeDate(0)}", Yesterday is "${getRelativeDate(1)}", and 2 days ago is "${getRelativeDate(2)}".
-   - Each briefing must contain: id (1-10), title, details (2-3 detailed sentences), source (real publication, e.g. "TechCrunch", "Wall Street Journal", "Bloomberg", "Reuters", "The New York Times"), and url.
+   - Each briefing must contain: id (1-10), title, details (2-3 detailed sentences explaining the news and answering "What operational or financial adjustments should an enterprise leader make because of this?"), source (real publication, e.g. "TechCrunch", "Wall Street Journal", "Bloomberg", "Reuters", "The New York Times"), and url.
    - Ground these briefings on the raw articles provided below.
 
 2. "xFeed": Compile the latest, real-world tweets for the following key voices (2 tweets each). Reflect their actual recent topics and opinions.
