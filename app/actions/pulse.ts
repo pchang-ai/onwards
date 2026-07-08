@@ -158,24 +158,6 @@ function parsePodcastRss(xmlText: string, limit = 6): { title: string; duration:
   return episodes;
 }
 
-// iTunes Search API feed URL lookup
-async function lookupFeedUrl(term: string, fallback: string): Promise<string> {
-  try {
-    const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&media=podcast&limit=1`, {
-      signal: AbortSignal.timeout(4000)
-    });
-    if (res.ok) {
-      const data = await res.json();
-      if (data.results && data.results.length > 0 && data.results[0].feedUrl) {
-        return data.results[0].feedUrl;
-      }
-    }
-  } catch (e) {
-    console.error(`iTunes lookup failed for "${term}":`, e);
-  }
-  return fallback;
-}
-
 // Fetch podcast helper
 async function fetchPodcastEpisodes(feedUrl: string, limit = 6): Promise<{ title: string; duration: string; audioUrl: string; pubDate: string }[]> {
   try {
@@ -202,7 +184,7 @@ export async function fetchLivePulseData(): Promise<{
 }> {
   console.log("Starting live Pulse feed synchronization...");
 
-  // 1. Fetch News RSS Feeds in parallel
+  // 1. Define News and Podcast Feeds to fetch in parallel
   const newsFeeds = [
     { name: "NYT Technology", url: "https://rss.nytimes.com/services/xml/rss/nyt/Technology.xml" },
     { name: "Techmeme", url: "https://www.techmeme.com/feed.xml" },
@@ -211,6 +193,15 @@ export async function fetchLivePulseData(): Promise<{
     { name: "Yahoo Finance", url: "https://finance.yahoo.com/news/rssindex" }
   ];
 
+  const podcastDefinitions = [
+    { id: "pod-1", title: "AI Daily Brief", host: "Nathaniel Whittemore", url: "https://anchor.fm/s/f7cac464/podcast/rss" },
+    { id: "pod-2", title: "How I AI", host: "Claire Vo", url: "https://anchor.fm/s/1035b1568/podcast/rss" },
+    { id: "pod-3", title: "Practical AI", host: "Chris Benson & Daniel Whitenack", url: "https://changelog.com/master/feed" },
+    { id: "pod-4", title: "AI Explained", host: "Philip", url: "https://rss.buzzsprout.com/2418777.rss" },
+    { id: "pod-5", title: "NVIDIA AI Podcast", host: "Noah Kravitz", url: "https://feeds.megaphone.fm/nvidiaaipodcast" }
+  ];
+
+  // Map to fetch promises
   const newsPromises = newsFeeds.map(async (feed) => {
     try {
       const res = await fetch(feed.url, {
@@ -229,7 +220,46 @@ export async function fetchLivePulseData(): Promise<{
     return [];
   });
 
-  const newsResults = await Promise.allSettled(newsPromises);
+  const podcastPromises = podcastDefinitions.map(async (podDef) => {
+    try {
+      const liveEpisodes = await fetchPodcastEpisodes(podDef.url);
+      const fallbackPod = podcastsData.find(p => p.id === podDef.id);
+      const episodes = liveEpisodes.length > 0
+        ? liveEpisodes.map((ep, idx) => ({
+            id: `ep-${podDef.id.split("-")[1]}-${idx + 1}`,
+            title: ep.title,
+            duration: ep.duration,
+            audioUrl: ep.audioUrl
+          }))
+        : (fallbackPod ? fallbackPod.episodes : []);
+
+      return {
+        id: podDef.id,
+        title: podDef.title,
+        host: podDef.host,
+        desc: fallbackPod ? fallbackPod.desc : `Latest episodes from ${podDef.title}.`,
+        episodes
+      };
+    } catch (e) {
+      console.warn(`Failed to fetch podcast feed ${podDef.title}:`, e);
+      const fallbackPod = podcastsData.find(p => p.id === podDef.id);
+      return {
+        id: podDef.id,
+        title: podDef.title,
+        host: podDef.host,
+        desc: fallbackPod ? fallbackPod.desc : `Latest episodes from ${podDef.title}.`,
+        episodes: fallbackPod ? fallbackPod.episodes : []
+      };
+    }
+  });
+
+  // Kick off both news and podcasts concurrently!
+  const [newsResults, podcastResults] = await Promise.all([
+    Promise.allSettled(newsPromises),
+    Promise.allSettled(podcastPromises)
+  ]);
+
+  // Process news articles
   const rawArticles: RawArticle[] = [];
   newsResults.forEach((result) => {
     if (result.status === "fulfilled") {
@@ -255,41 +285,33 @@ export async function fetchLivePulseData(): Promise<{
     return db - da;
   });
 
-  // 2. Fetch Podcasts in parallel
-  console.log("Sourcing live podcasts...");
-  const podcastDefinitions = [
-    { id: "pod-1", title: "AI Daily Brief", host: "Nathaniel Whittemore", query: "AI Daily Brief Nathaniel Whittemore", fallback: "https://feeds.megaphone.fm/thedailybrief" },
-    { id: "pod-2", title: "How I AI", host: "Claire Vo", query: "How I AI Claire Vo", fallback: "https://feeds.megaphone.fm/lenny" },
-    { id: "pod-3", title: "Practical AI", host: "Chris Benson & Daniel Whitenack", query: "Practical AI Changelog", fallback: "https://practicalai.fm/feed" },
-    { id: "pod-4", title: "AI Explained", host: "Philip", query: "AI Explained Philip", fallback: "https://www.buzzsprout.com/2418777.rss" },
-    { id: "pod-5", title: "NVIDIA AI Podcast", host: "Noah Kravitz", query: "NVIDIA AI Podcast Noah Kravitz", fallback: "https://feeds.megaphone.fm/STU4373413809" }
-  ];
-
-  const podcastPromises = podcastDefinitions.map(async (podDef) => {
-    const feedUrl = await lookupFeedUrl(podDef.query, podDef.fallback);
-    const liveEpisodes = await fetchPodcastEpisodes(feedUrl);
-    
-    // Fallback episodes if feed failed to fetch episodes
-    const fallbackPod = podcastsData.find(p => p.id === podDef.id);
-    const episodes = liveEpisodes.length > 0
-      ? liveEpisodes.map((ep, idx) => ({
-          id: `ep-${podDef.id.split("-")[1]}-${idx + 1}`,
-          title: ep.title,
-          duration: ep.duration,
-          audioUrl: ep.audioUrl
-        }))
-      : (fallbackPod ? fallbackPod.episodes : []);
-
-    return {
-      id: podDef.id,
-      title: podDef.title,
-      host: podDef.host,
-      desc: fallbackPod ? fallbackPod.desc : `Latest episodes from ${podDef.title}.`,
-      episodes
-    };
+  // Process podcast results
+  const parsedPodcasts: Podcast[] = [];
+  podcastResults.forEach((result) => {
+    if (result.status === "fulfilled") {
+      parsedPodcasts.push(result.value);
+    }
   });
 
-  const parsedPodcasts = await Promise.all(podcastPromises);
+  // If we missed any podcast (allSettled failed entirely for a promise), fill in with fallback
+  podcastDefinitions.forEach((podDef) => {
+    if (!parsedPodcasts.some(p => p.id === podDef.id)) {
+      const fallbackPod = podcastsData.find(p => p.id === podDef.id);
+      parsedPodcasts.push({
+        id: podDef.id,
+        title: podDef.title,
+        host: podDef.host,
+        desc: fallbackPod ? fallbackPod.desc : `Latest episodes from ${podDef.title}.`,
+        episodes: fallbackPod ? fallbackPod.episodes : []
+      });
+    }
+  });
+  // Sort parsed podcasts back to matching definitions order
+  parsedPodcasts.sort((a, b) => {
+    const idxA = podcastDefinitions.findIndex(d => d.id === a.id);
+    const idxB = podcastDefinitions.findIndex(d => d.id === b.id);
+    return idxA - idxB;
+  });
 
   // 3. Compile News Briefings & Key Voices
   let finalNews: DayNews[] = [];
@@ -303,7 +325,7 @@ export async function fetchLivePulseData(): Promise<{
       const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`;
 
       const prompt = `
-You are a senior tech news editor and researcher. Analyze the following raw tech/business articles and search the web for the actual current state of these topics.
+You are a senior tech news editor and researcher. Analyze the following raw tech/business articles and synthesize a clean, grammatically perfect JSON output.
 
 To select and filter the news briefings to show, you MUST strictly apply the following criteria:
 
@@ -330,9 +352,9 @@ Low Rank: Commute-specific traffic alerts, minor localized property crimes, or s
 The Filter Rule: If a news story cannot answer "What operational or financial adjustments should an enterprise leader make because of this?", it is filtered out to maintain a clean, scannable format.
 
 Generate:
-1. "news": Exactly 3 days of news briefings: Today, Yesterday, and 2 days ago.
-   - For each of these 3 days, select exactly 10 high-quality, real-world tech/business briefings (total 30 briefings).
-   - Use dates: Today is "${getRelativeDate(0)}", Yesterday is "${getRelativeDate(1)}", and 2 days ago is "${getRelativeDate(2)}".
+1. "news": Exactly 4 days of news briefings: Today, Yesterday, 2 days ago, and 3 days ago.
+   - For each of these 4 days, select exactly 10 high-quality, real-world tech/business briefings (total 40 briefings).
+   - Use dates: Today is "${getRelativeDate(0)}", Yesterday is "${getRelativeDate(1)}", 2 days ago is "${getRelativeDate(2)}", and 3 days ago is "${getRelativeDate(3)}".
    - Each briefing must contain: id (1-10), title, details (2-3 detailed sentences explaining the news and answering "What operational or financial adjustments should an enterprise leader make because of this?"), source (real publication, e.g. "TechCrunch", "Wall Street Journal", "Bloomberg", "Reuters", "The New York Times"), and url.
    - Ground these briefings on the raw articles provided below.
 
@@ -387,15 +409,14 @@ TYPOGRAPHY & ACCURACY RULES:
 1. Ensure there are absolutely no spelling errors, typos, or smart quotes in the output. Use standard straight double quotes (") and standard straight single quotes (').
 2. Do not output any em-dashes (—). Replace them with a standard space-hyphen-space " - " or rewrite the text to avoid them.
 3. Clean all text of any raw HTML tags, CDATA remnants, or corporate boilerplate.
-4. Ensure the tweets read as authentic, professional social posts matching the tone of each key voice.
+4. Ensure the tweets read as authentic, professional social posts matching the tone of each key voice, commenting on the latest news where appropriate.
 `;
 
       const response = await fetch(geminiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          tools: [{ googleSearch: {} }] // Enable Google Search grounding
+          contents: [{ parts: [{ text: prompt }] }]
         })
       });
 
@@ -404,7 +425,7 @@ TYPOGRAPHY & ACCURACY RULES:
         let textResponse = data.candidates[0].content.parts[0].text;
         textResponse = textResponse.replace(/```json/g, '').replace(/```/g, '').trim();
         const parsed = JSON.parse(textResponse);
-        if (parsed.news && parsed.news.length === 3 && parsed.xFeed) {
+        if (parsed.news && parsed.news.length === 4 && parsed.xFeed) {
           finalNews = parsed.news;
           finalXFeed = parsed.xFeed;
         }
@@ -418,10 +439,11 @@ TYPOGRAPHY & ACCURACY RULES:
   if (finalNews.length === 0) {
     console.log("Compiling news/twitter using local parser engine fallback...");
     
-    // Group raw articles into 3 days of 10 items
+    // Group raw articles into 4 days of 10 items
     const todayArticles = uniqueArticles.slice(0, 10);
     const yesterdayArticles = uniqueArticles.slice(10, 20);
     const dayBeforeArticles = uniqueArticles.slice(20, 30);
+    const threeDaysAgoArticles = uniqueArticles.slice(30, 40);
 
     const padList = (list: RawArticle[], fallbackDayData: any) => {
       const result = [...list];
@@ -460,6 +482,11 @@ TYPOGRAPHY & ACCURACY RULES:
         date: getRelativeDate(2),
         isToday: false,
         news: padList(dayBeforeArticles, dailyNewsData[2])
+      },
+      {
+        date: getRelativeDate(3),
+        isToday: false,
+        news: padList(threeDaysAgoArticles, dailyNewsData[3])
       }
     ];
 
