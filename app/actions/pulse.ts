@@ -158,15 +158,33 @@ function parsePodcastRss(xmlText: string, limit = 6): { title: string; duration:
   return episodes;
 }
 
+// Helper to perform fetch with a timeout compatible with all Node versions
+async function fetchWithTimeout(url: string, options: any = {}): Promise<Response> {
+  const { timeout = 5000, ...fetchOptions } = options;
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
+  try {
+    const response = await fetch(url, {
+      ...fetchOptions,
+      signal: controller.signal
+    });
+    clearTimeout(id);
+    return response;
+  } catch (error) {
+    clearTimeout(id);
+    throw error;
+  }
+}
+
 // Fetch podcast helper
 async function fetchPodcastEpisodes(feedUrl: string, limit = 6): Promise<{ title: string; duration: string; audioUrl: string; pubDate: string }[]> {
   try {
-    const res = await fetch(feedUrl, {
+    const res = await fetchWithTimeout(feedUrl, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
       },
       next: { revalidate: 300 }, // Cache 5 min
-      signal: AbortSignal.timeout(5000)
+      timeout: 5000
     });
     if (!res.ok) return [];
     const xml = await res.text();
@@ -204,11 +222,11 @@ export async function fetchLivePulseData(): Promise<{
   // Map to fetch promises
   const newsPromises = newsFeeds.map(async (feed) => {
     try {
-      const res = await fetch(feed.url, {
+      const res = await fetchWithTimeout(feed.url, {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
         },
-        signal: AbortSignal.timeout(5000)
+        timeout: 5000
       });
       if (res.ok) {
         const xml = await res.text();

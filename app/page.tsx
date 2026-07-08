@@ -365,6 +365,19 @@ export default function Home() {
     null,
   );
 
+  useEffect(() => {
+    // Re-initialize with dynamic current local browser dates on mount
+    setNewsData([...dailyNewsData]);
+    setXFeed([...xFeedData]);
+    setExpandedDays(() => {
+      const initial: Record<string, boolean> = {};
+      dailyNewsData.forEach((day, idx) => {
+        initial[day.date] = idx === 0;
+      });
+      return initial;
+    });
+  }, []);
+
   const handleRefreshPulse = async () => {
     setIsRefreshingPulse(true);
     setRefreshPulseMessage(null);
